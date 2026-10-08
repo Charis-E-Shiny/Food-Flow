@@ -28,6 +28,12 @@ ml/artifacts/*.joblib
 __pycache__/
 *.pyc
 
+# Large raw datasets — regenerable / downloaded, exceed GitHub limits.
+# The trained model's metrics (ml/artifacts/*.json, public/data/model-metrics.json)
+# are committed; the 200MB+ source CSV is not.
+master_aggriculture_dataset.csv
+*.csv.gz
+
 # Logs
 logs/
 *.log

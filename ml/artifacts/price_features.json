@@ -1,0 +1,16 @@
+{
+  "features": [
+    "logp",
+    "ret1",
+    "ret7",
+    "dev_roll7",
+    "dev_roll30",
+    "temp_mean",
+    "rainfall_mm",
+    "rain_roll7",
+    "sin_doy",
+    "cos_doy",
+    "commodity_code"
+  ],
+  "target": "modal_price(t+1)"
+}

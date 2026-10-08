@@ -445,19 +445,25 @@ FoodFlow is being moved from prototype toward a real data-backed system. What is
 | Area | Status | How to reproduce |
 |---|---|---|
 | **Weather** (Open-Meteo) | ✅ **Live, tested** — real current + forecast for all 14 mandis; shown with a `Live` badge, source and freshness, with honest demo fallback | `npm run ingest:weather` |
-| **Market** (Agmarknet / data.gov.in) | ⚠️ connector built & unit-tested, but `api.data.gov.in` **isn't reachable in this build** — no data fabricated, status recorded | `npm run ingest:market` (needs key + egress) |
-| **ML pipeline** | ✅ **real & reproducible** — chronological split, baselines vs GradientBoosting, honest MAE/RMSE on real history | `npm run ml:train` → [`ml/`](ml/README.md) |
+| **Market** (Agmarknet / data.gov.in) | ⚠️ live connector built & unit-tested, but `api.data.gov.in` **isn't reachable in this build** — no data fabricated, status recorded | `npm run ingest:market` (needs key + egress) |
+| **Price-forecast model** | ✅ **trained on real data** — 7-day-ahead mandi modal-price forecaster on `master_aggriculture_dataset.csv` (654k market-days, 1,377 markets, 5 commodities, 2023–25); chronological held-out test; beats naive persistence by **~10% RMSE** and seasonal climatology by **~73% RMSE**. Metrics shown live on **Impact** | `npm run ml:train:price` → [`ml/`](ml/README.md) |
+| **ML pipeline (weather)** | ✅ **real & reproducible** — chronological split, baselines vs GradientBoosting, honest MAE/RMSE on real Open-Meteo history | `npm run ml:train` → [`ml/`](ml/README.md) |
 | **Allocation optimizer** | ✅ real marginal-value optimizer (concave objective, capacity + conservation constraints), compared to greedy baseline | `npm run test` |
 | **Provenance** | ✅ UI distinguishes **Live / Historical / Model / Estimate / Demo**; never labels fallback as Live | `src/lib/provenance.ts` |
 
 ```bash
 npm run test            # 17 tests: normalization, optimizer constraints, engine invariants
 npm run ingest:weather  # real Open-Meteo snapshot → public/data/weather.json
-npm run ml:train        # real training → ml/artifacts/metrics.json
+npm run ml:train        # real weather training → ml/artifacts/metrics.json
+npm run ml:train:price  # real price model → ml/artifacts/price_metrics.json + public/data/model-metrics.json
 ```
 
-> **Honesty notes.** The Agmarknet price panel is labeled **Demo** until the API
-> is reachable with a key. Surplus risk is a **transparent heuristic**, not a
+> **Honesty notes.** A real **price-forecast model is now trained** on
+> `master_aggriculture_dataset.csv`; its metrics on the **Impact** page are the
+> model's own held-out test numbers (never fabricated), and we report where
+> naive persistence still wins (typical-day MAE) rather than cherry-pick. The
+> live Agmarknet *ingestion* panel stays labeled **Demo** until the API is
+> reachable with a key. Surplus risk is a **transparent heuristic**, not a
 > trained model and **not** verified food waste. The traceability ledger is
 > deterministic/in-memory and is **never** described as a blockchain transaction.
 > See [`DATA.md`](DATA.md) for the complete provenance and limitations.
@@ -477,8 +483,9 @@ This is a **prototype / sandbox**. It demonstrates *how the real system would wo
 | localStorage auth | Real auth + role-based authorization |
 | Reconciliation numbers | IoT / weighbridge-verified receipts |
 
-No ML model was trained and no blockchain transaction occurred. All figures are
-clearly framed as illustrative.
+The price-forecast model **is** trained on real data (metrics on the Impact
+page are its own held-out test results); the in-app scenario figures and the
+traceability ledger remain illustrative, and no blockchain transaction occurred.
 
 ---
 
@@ -487,8 +494,9 @@ clearly framed as illustrative.
 - [x] Real weather integration (Open-Meteo) with provenance + fallback
 - [x] Real optimizer (marginal-value / concave objective) + constraint tests
 - [x] Reproducible ML pipeline with honest metrics
+- [x] Train the price model on real mandi history (7-day-ahead, metrics live on Impact)
 - [ ] Reach `api.data.gov.in` + key → live Agmarknet prices (connector ready)
-- [ ] Train the price/arrivals model on Agmarknet history (pipeline ready)
+- [ ] Wire the trained model to score live forecasts in-app (currently reports held-out metrics)
 - [ ] Backend for scheduled ingestion, persistence & secure credentials
 - [ ] Per-event optimization for every city (not just the canonical scenario)
 - [ ] Real persistence + QR deep-link verification for batches

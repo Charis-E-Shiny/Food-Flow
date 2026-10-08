@@ -79,3 +79,26 @@ export const STATE_SHAPES: StateShape[] = (india as unknown as {
   name: f.properties.name,
   d: f.geometry.coordinates.map((poly) => poly.map((r) => ringToPath(r as Ring)).join(" ")).join(" "),
 }));
+
+// ------------------------------------------------------------
+// Real India geometry for the Leaflet map (so the basemap can be
+// masked to India only). GeoJSON rings are [lon,lat]; Leaflet wants
+// [lat,lng]. We expose every state's OUTER ring as a [lat,lng] ring —
+// their union is the national landmass used to punch a hole in the mask.
+// ------------------------------------------------------------
+export const INDIA_GEOJSON = india as unknown as Record<string, unknown>;
+
+export const INDIA_OUTER_RINGS: [number, number][][] = (india as unknown as {
+  features: { geometry: { coordinates: Ring[][] } }[];
+}).features.flatMap((f) =>
+  f.geometry.coordinates.map((poly) => (poly[0] as Ring).map(([lon, lat]) => [lat, lon] as [number, number])),
+);
+
+// A generous world rectangle (lat,lng) used as the mask's outer ring;
+// India rings become holes so only India shows the basemap tiles.
+export const WORLD_RING: [number, number][] = [
+  [-85, -200],
+  [-85, 200],
+  [85, 200],
+  [85, -200],
+];

@@ -65,13 +65,35 @@ access is provisioned.
 
 ## ML pipeline (real, reproducible)
 
-See [`ml/README.md`](ml/README.md). Because Agmarknet history is unreachable
-here, the pipeline is demonstrated on **real Open-Meteo history** (next-day
-`tmax` forecast). It is **data-source agnostic** — swap `fetch_series()` for
-Agmarknet modal prices to get a price forecaster. **No price/surplus model is
-claimed as trained.**
+See [`ml/README.md`](ml/README.md). Two trained models, both on real data.
 
-**Actual test-set metrics** (1,277 days, Kolar, chronological split):
+### Price model — `master_aggriculture_dataset.csv` (real, trained)
+
+A **7-day-ahead mandi modal-price forecaster** trained on a real Agmarknet-style
+dataset joined with Open-Meteo weather: **654k market-days, 1,377 markets, 5
+commodities** (Onion & Potato dominate; Rice/Tomato/Wheat partial), 2023-06 →
+2025-06. Leakage-free: per-series lag/rolling/seasonal features, **chronological**
+70/15/15 split, scale-free **log-return** target + validation-tuned shrinkage
+blend. Held-out test (`price-hgbt-v1`):
+
+| Model | MAE (₹/qtl) | RMSE (₹/qtl) | MAPE |
+|---|---|---|---|
+| persistence baseline | **170** | 419 | **10.2%** |
+| climatology baseline | 906 | 1,394 | 54.6% |
+| **FoodFlow model** | 187 | **376** | 11.7% |
+
+The model beats persistence by **~10% RMSE** and climatology by **~73% RMSE** (the
+large swings that drive surplus/waste); naive persistence still wins typical-day
+MAE and that is reported plainly, not hidden. Metrics render live on the Impact
+page from `public/data/model-metrics.json`.
+
+> The 200 MB+ source CSV is **not committed** (exceeds GitHub limits); the trained
+> model's metrics are. Reproduce: `npm run ml:train:price`.
+
+### Weather model — Open-Meteo (real, trained)
+
+Next-day `tmax` forecast as a spoilage proxy. Test-set metrics (1,277 days, Kolar,
+chronological split):
 
 | Model | MAE (°C) | RMSE (°C) |
 |---|---|---|

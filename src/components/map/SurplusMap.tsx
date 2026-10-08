@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { MapContainer, Marker, Polyline, TileLayer, Tooltip } from "react-leaflet";
+import { GeoJSON, MapContainer, Marker, Polygon, Polyline, TileLayer, Tooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { cn } from "@/lib/cn";
-import { unproject } from "@/data/geo";
+import { unproject, INDIA_GEOJSON, INDIA_OUTER_RINGS, WORLD_RING } from "@/data/geo";
 import { CROP_META } from "@/data/images";
 import type { DemandNode, GeoPoint, RiskBand, SurplusForecast } from "@/types";
 import { tonnes } from "@/lib/format";
@@ -99,19 +99,22 @@ export function SurplusMap({
   scrollZoom?: boolean;
 }) {
   const curves = useMemo(() => flows.map((fl) => curve(unproject(fl.from), unproject(fl.to))), [flows]);
+  // World rectangle with India punched out as holes → everything outside
+  // India is dimmed, so the map reads as India-only.
+  const maskRings = useMemo(() => [WORLD_RING, ...INDIA_OUTER_RINGS], []);
 
   return (
     <div className={cn("relative isolate w-full overflow-hidden rounded-2xl border border-line", aspect, className)}>
       <MapContainer
-        center={[22.6, 81.5]}
-        zoom={4.8}
-        minZoom={4}
+        center={[22.9, 80.2]}
+        zoom={4.7}
+        minZoom={4.3}
         maxZoom={9}
         maxBounds={[
-          [5, 66],
-          [38, 99],
+          [6, 67],
+          [37, 98],
         ]}
-        maxBoundsViscosity={0.85}
+        maxBoundsViscosity={1}
         zoomControl
         scrollWheelZoom={scrollZoom}
         attributionControl
@@ -119,6 +122,17 @@ export function SurplusMap({
         style={{ background: "rgb(var(--c-surface-2))" }}
       >
         <TileLayer url={TILES.url} attribution={TILES.attribution} />
+
+        {/* Dim everything outside India */}
+        <Polygon
+          positions={maskRings}
+          pathOptions={{ stroke: false, fillColor: "rgb(236,239,234)", fillOpacity: 0.78, fillRule: "evenodd", interactive: false }}
+        />
+        {/* Real state boundaries */}
+        <GeoJSON
+          data={INDIA_GEOJSON as any}
+          style={{ color: "rgb(120,132,116)", weight: 0.7, opacity: 0.55, fill: false, interactive: false } as any}
+        />
 
         {curves.map((pts, i) => (
           <Polyline key={i} positions={pts} pathOptions={{ color: "rgb(27,94,63)", weight: 2 + (flows[i].quantityT / 15) * 3, opacity: 0.7, dashArray: "6 8", lineCap: "round" }} />

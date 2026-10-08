@@ -1,0 +1,124 @@
+{
+  "model_version": "price-hgbt-v1",
+  "task": "7-day-ahead mandi modal price (₹/quintal) forecast",
+  "horizon_days": 7,
+  "dataset": "master_aggriculture_dataset.csv — Agmarknet-style daily modal prices + Open-Meteo weather",
+  "trained_at": "2026-10-08T23:14:21.500806+00:00",
+  "span": {
+    "from": "2023-06-13",
+    "to": "2025-06-04"
+  },
+  "coverage": {
+    "commodities": 5,
+    "markets": 1377,
+    "series_days": 654507
+  },
+  "split": {
+    "train": 458452,
+    "val": 98784,
+    "test": 97271,
+    "test_from": "2025-02-27"
+  },
+  "features": [
+    "logp",
+    "ret1",
+    "ret7",
+    "dev_roll7",
+    "dev_roll30",
+    "temp_mean",
+    "rainfall_mm",
+    "rain_roll7",
+    "sin_doy",
+    "cos_doy",
+    "commodity_code"
+  ],
+  "metrics_test": {
+    "baseline_persistence": {
+      "mae": 170.2,
+      "rmse": 418.8,
+      "mape": 10.16
+    },
+    "baseline_climatology": {
+      "mae": 906.0,
+      "rmse": 1393.6,
+      "mape": 54.61
+    },
+    "model_gbt": {
+      "mae": 187.0,
+      "rmse": 376.4,
+      "mape": 11.72
+    }
+  },
+  "blend_weight": 0.725,
+  "model_vs_persistence_mae_improvement_pct": -9.9,
+  "model_vs_persistence_rmse_improvement_pct": 10.1,
+  "feature_importance": [
+    {
+      "feature": "commodity_code",
+      "importance": 0.003
+    },
+    {
+      "feature": "cos_doy",
+      "importance": 0.002
+    },
+    {
+      "feature": "logp",
+      "importance": 0.001
+    },
+    {
+      "feature": "ret7",
+      "importance": 0.0
+    },
+    {
+      "feature": "dev_roll7",
+      "importance": -0.0
+    },
+    {
+      "feature": "temp_mean",
+      "importance": 0.0
+    },
+    {
+      "feature": "rainfall_mm",
+      "importance": -0.0
+    },
+    {
+      "feature": "rain_roll7",
+      "importance": 0.0
+    },
+    {
+      "feature": "sin_doy",
+      "importance": -0.0
+    },
+    {
+      "feature": "ret1",
+      "importance": -0.001
+    },
+    {
+      "feature": "dev_roll30",
+      "importance": -0.004
+    }
+  ],
+  "per_commodity_mae": [
+    {
+      "commodity": "Onion",
+      "mae": 242.9,
+      "baseline_mae": 213.8,
+      "improvement_pct": -13.6,
+      "n": 46871
+    },
+    {
+      "commodity": "Potato",
+      "mae": 142.0,
+      "baseline_mae": 136.4,
+      "improvement_pct": -4.1,
+      "n": 45658
+    },
+    {
+      "commodity": "Rice",
+      "mae": 67.1,
+      "baseline_mae": 64.3,
+      "improvement_pct": -4.5,
+      "n": 4742
+    }
+  ]
+}

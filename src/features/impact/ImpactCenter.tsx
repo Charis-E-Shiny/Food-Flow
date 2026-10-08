@@ -12,6 +12,7 @@ import { PageHead } from "@/components/layout/PageHead";
 import { Card, SectionTitle, Badge } from "@/components/ui";
 import { StatTile } from "@/components/ui/StatTile";
 import { Counterfactual } from "./Counterfactual";
+import { ModelPerformance } from "./ModelPerformance";
 import { IMPACT_METRICS } from "@/data/scenario";
 import { IMPACT_TREND } from "@/data/mockData";
 import { CHAIN, IMPACT_ASSUMPTIONS } from "@/data/delivery";
@@ -87,6 +88,11 @@ export default function ImpactCenter() {
           ))}
         </ul>
       </Card>
+
+      {/* Trained price-forecast model — real data, held-out metrics */}
+      <div className="mt-4">
+        <ModelPerformance />
+      </div>
 
       {/* Counterfactual */}
       <div className="mt-4">

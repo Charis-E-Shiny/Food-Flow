@@ -11,7 +11,8 @@
     "test": "vitest run",
     "ingest:weather": "node scripts/ingest-weather.mjs",
     "ingest:market": "node scripts/ingest-market.mjs",
-    "ml:train": "python ml/train.py"
+    "ml:train": "python ml/train.py",
+    "ml:train:price": "python ml/train_price.py"
   },
   "dependencies": {
     "framer-motion": "11.11.17",
