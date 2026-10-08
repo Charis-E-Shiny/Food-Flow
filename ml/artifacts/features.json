@@ -1,0 +1,14 @@
+{
+  "features": [
+    "sin_doy",
+    "cos_doy",
+    "tmax_lag1",
+    "tmax_lag2",
+    "tmax_lag3",
+    "tmax_lag7",
+    "tmin_lag1",
+    "precip_lag1",
+    "tmax_roll7"
+  ],
+  "target": "tmax(t+1)"
+}

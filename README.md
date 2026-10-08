@@ -76,6 +76,9 @@ pre-surplus intervention layer** and **multi-destination allocation optimization
     <td><img src="docs/screenshots/market.png" alt="Market" /><p align="center"><sub><b>Market</b> — all-commodity price board</sub></p></td>
     <td><img src="docs/screenshots/landing.png" alt="Landing" /><p align="center"><sub><b>Landing</b> — product site</sub></p></td>
   </tr>
+  <tr>
+    <td colspan="2"><img src="docs/screenshots/event-data.png" alt="Event detail with live weather" /><p align="center"><sub><b>Event detail</b> — <b>live</b> Open-Meteo weather (honest provenance) beside clearly-labeled demo market intelligence</sub></p></td>
+  </tr>
 </table>
 
 ---
@@ -434,6 +437,33 @@ vercel --prod   # production
 
 ---
 
+## 🔌 Real data, models & tests
+
+FoodFlow is being moved from prototype toward a real data-backed system. What is
+**genuinely integrated and tested** (full ledger in [`DATA.md`](DATA.md)):
+
+| Area | Status | How to reproduce |
+|---|---|---|
+| **Weather** (Open-Meteo) | ✅ **Live, tested** — real current + forecast for all 14 mandis; shown with a `Live` badge, source and freshness, with honest demo fallback | `npm run ingest:weather` |
+| **Market** (Agmarknet / data.gov.in) | ⚠️ connector built & unit-tested, but `api.data.gov.in` **isn't reachable in this build** — no data fabricated, status recorded | `npm run ingest:market` (needs key + egress) |
+| **ML pipeline** | ✅ **real & reproducible** — chronological split, baselines vs GradientBoosting, honest MAE/RMSE on real history | `npm run ml:train` → [`ml/`](ml/README.md) |
+| **Allocation optimizer** | ✅ real marginal-value optimizer (concave objective, capacity + conservation constraints), compared to greedy baseline | `npm run test` |
+| **Provenance** | ✅ UI distinguishes **Live / Historical / Model / Estimate / Demo**; never labels fallback as Live | `src/lib/provenance.ts` |
+
+```bash
+npm run test            # 17 tests: normalization, optimizer constraints, engine invariants
+npm run ingest:weather  # real Open-Meteo snapshot → public/data/weather.json
+npm run ml:train        # real training → ml/artifacts/metrics.json
+```
+
+> **Honesty notes.** The Agmarknet price panel is labeled **Demo** until the API
+> is reachable with a key. Surplus risk is a **transparent heuristic**, not a
+> trained model and **not** verified food waste. The traceability ledger is
+> deterministic/in-memory and is **never** described as a blockchain transaction.
+> See [`DATA.md`](DATA.md) for the complete provenance and limitations.
+
+---
+
 ## 🔬 What's simulated vs. production
 
 This is a **prototype / sandbox**. It demonstrates *how the real system would work*.
@@ -454,12 +484,15 @@ clearly framed as illustrative.
 
 ## 🛣 Roadmap
 
-- [ ] Wire real Agmarknet + IMD weather feeds behind the existing interfaces
-- [ ] Replace the greedy allocator with a true optimization solver
+- [x] Real weather integration (Open-Meteo) with provenance + fallback
+- [x] Real optimizer (marginal-value / concave objective) + constraint tests
+- [x] Reproducible ML pipeline with honest metrics
+- [ ] Reach `api.data.gov.in` + key → live Agmarknet prices (connector ready)
+- [ ] Train the price/arrivals model on Agmarknet history (pipeline ready)
+- [ ] Backend for scheduled ingestion, persistence & secure credentials
 - [ ] Per-event optimization for every city (not just the canonical scenario)
-- [ ] Ledger integration + QR deep-link verification
-- [ ] Farmer SMS / IVR channel
-- [ ] Dark mode
+- [ ] Real persistence + QR deep-link verification for batches
+- [ ] Farmer SMS / IVR channel · Dark mode
 
 ---
 

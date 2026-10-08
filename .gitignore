@@ -23,6 +23,11 @@ dist-ssr/
 *.sw?
 Thumbs.db
 
+# ML artifacts (model binaries are regenerable; metrics/features are committed)
+ml/artifacts/*.joblib
+__pycache__/
+*.pyc
+
 # Logs
 logs/
 *.log
@@ -30,3 +35,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# TS build info
+*.tsbuildinfo

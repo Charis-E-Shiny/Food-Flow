@@ -6,6 +6,7 @@ import { Card, SectionTitle, Badge, bandTone, bandLabel, LinkButton } from "@/co
 import { getForecast, CANONICAL_FORECAST_ID } from "@/data/mockData";
 import { CROP_META } from "@/data/images";
 import { MarketIntelligence } from "./MarketIntelligence";
+import { WeatherPanel } from "./WeatherPanel";
 import { rupeesPerKg, tonnes, hours } from "@/lib/format";
 import type { SurplusForecast } from "@/types";
 
@@ -51,8 +52,9 @@ export default function EventDetail() {
         <OverviewTile value={`${f.wasteRisk}/100`} label="Waste risk" accent="risk" />
       </div>
 
-      {/* Market intelligence (mandi price + arrivals + forecast) */}
-      <div className="mt-4">
+      {/* Live weather (real) + market intelligence (simulated) */}
+      <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_1.6fr]">
+        <WeatherPanel forecast={f} />
         <MarketIntelligence forecast={f} />
       </div>
 

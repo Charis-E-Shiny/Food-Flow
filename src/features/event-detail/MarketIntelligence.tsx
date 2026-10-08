@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { Activity, AlertTriangle, ArrowDownRight, ArrowUpRight, TrendingUp } from "lucide-react";
 import { Card, SectionTitle, Badge } from "@/components/ui";
+import { ProvenanceBadge } from "@/components/ui/ProvenanceBadge";
 import { marketSeries } from "@/data/market";
 import type { SurplusForecast } from "@/types";
 import { rupeesPerKg } from "@/lib/format";
@@ -25,11 +26,14 @@ export function MarketIntelligence({ forecast }: { forecast: SurplusForecast }) 
       <SectionTitle
         eyebrow="Market intelligence"
         title="Mandi price & arrivals"
-        sub="Agmarknet-style modal price, ML forecast and arrivals. Simulated for this prototype."
+        sub="Agmarknet-style modal price, forecast and arrivals. Simulated — the Agmarknet API is not reachable in this build (see DATA.md)."
         right={
-          <Badge tone={m.forecastDirection === "up" ? "ok" : m.forecastDirection === "down" ? "risk" : "neutral"} dot>
-            Forecast {m.forecastDirection === "up" ? "firming" : m.forecastDirection === "down" ? "easing" : "flat"}
-          </Badge>
+          <div className="flex items-center gap-1.5">
+            <Badge tone={m.forecastDirection === "up" ? "ok" : m.forecastDirection === "down" ? "risk" : "neutral"} dot>
+              {m.forecastDirection === "up" ? "firming" : m.forecastDirection === "down" ? "easing" : "flat"}
+            </Badge>
+            <ProvenanceBadge kind="demo" />
+          </div>
         }
       />
 

@@ -5,7 +5,8 @@ import { PageHead } from "@/components/layout/PageHead";
 import { Card, SectionTitle, Badge, Button, LinkButton, Meter } from "@/components/ui";
 import { AllocationFlow } from "./AllocationFlow";
 import { KOLAR_SCENARIO } from "@/data/scenario";
-import { tonnes, hours, rupeesPerKg } from "@/lib/format";
+import { runOptimizer, objectiveOf, toOptInputs } from "@/lib/optimizer";
+import { tonnes, hours, rupeesPerKg, rupees } from "@/lib/format";
 import type { AllocationLeg, DemandNode } from "@/types";
 
 type Phase = "idle" | "running" | "done";
@@ -195,6 +196,10 @@ export default function Optimization() {
         </AnimatePresence>
       </div>
 
+      <div className="mt-4">
+        <OptimizerComparison />
+      </div>
+
       {phase === "done" && (
         <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-5 sm:flex-row">
           <p className="text-sm text-ink-2">Allocation generated. Create a traceable batch and follow it to delivery.</p>
@@ -236,6 +241,68 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div>
       <div className="nums text-lg font-bold text-ink">{value}</div>
       <div className="text-[11px] text-ink-3">{label}</div>
+    </div>
+  );
+}
+
+// Real optimizer (marginal-value / diminishing-returns) vs the greedy
+// baseline, scored on the same objective: expected realized value net of
+// transport and spoilage.
+function OptimizerComparison() {
+  const { forecast, nodes, allocation } = KOLAR_SCENARIO;
+  const opt = runOptimizer(forecast, nodes);
+  const inputs = toOptInputs(nodes);
+  const baseObj = objectiveOf(allocation.legs, inputs, forecast.spoilageWindowHours);
+  const optObj = opt.objectiveValue;
+  const delta = optObj - baseObj;
+  const pct = baseObj ? Math.round((delta / baseObj) * 1000) / 10 : 0;
+
+  return (
+    <Card className="p-5">
+      <SectionTitle
+        eyebrow="Optimizer"
+        title="Optimizer vs. greedy baseline"
+        sub="Same objective — expected realized value net of transport & spoilage. The optimizer models diminishing returns (glut effect), so it spreads volume instead of flooding the top market."
+        right={<Badge tone={delta >= 0 ? "ok" : "risk"} dot>{delta >= 0 ? "+" : ""}{pct}% objective</Badge>}
+      />
+      <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <Plan title="Greedy baseline" subtitle="fill highest score first" legs={allocation.legs} obj={baseObj} />
+        <Plan title="Optimizer (experimental)" subtitle="marginal-value water-filling" legs={opt.legs} obj={optObj} highlight />
+      </div>
+      <p className="mt-3 text-[11px] leading-relaxed text-ink-3">
+        Both respect capacity and conserve quantity (tested). The optimizer is experimental and not yet operationally executable —
+        destination capacity, transport availability and acceptance must be verified before dispatch.
+      </p>
+    </Card>
+  );
+}
+
+function Plan({ title, subtitle, legs, obj, highlight }: { title: string; subtitle: string; legs: AllocationLeg[]; obj: number; highlight?: boolean }) {
+  const total = legs.reduce((a, l) => a + l.quantityT, 0);
+  return (
+    <div className={"rounded-2xl border p-4 " + (highlight ? "border-brand/30 bg-brand-tint/50" : "border-line bg-surface")}>
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-sm font-semibold text-ink">{title}</div>
+          <div className="text-[11px] text-ink-3">{subtitle}</div>
+        </div>
+        <div className="text-right">
+          <div className="nums text-lg font-extrabold text-ink">{rupees(obj)}</div>
+          <div className="text-[10px] text-ink-3">expected value</div>
+        </div>
+      </div>
+      <div className="mt-3 space-y-1.5">
+        {legs.map((l) => (
+          <div key={l.nodeId} className="flex items-center justify-between text-xs">
+            <span className="truncate text-ink-2">{l.nodeName}</span>
+            <span className="nums font-semibold text-ink">{tonnes(l.quantityT)}</span>
+          </div>
+        ))}
+        <div className="flex items-center justify-between border-t border-line pt-1.5 text-xs font-semibold">
+          <span className="text-ink-2">Allocated</span>
+          <span className="nums text-ink">{tonnes(+total.toFixed(1))}</span>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,39 @@
+{
+  "model_version": "tmax-gbt-v1",
+  "task": "next-day tmax (\u00b0C) forecast",
+  "note": "Trained on REAL Open-Meteo historical weather. Not a price/surplus model \u2014 the pipeline is data-source agnostic (swap fetch_series for Agmarknet modal prices).",
+  "place": "Kolar",
+  "trained_at": "2026-10-08T22:23:31.732957Z",
+  "rows_total": 1269,
+  "split": {
+    "train": 888,
+    "val": 190,
+    "test": 191
+  },
+  "features": [
+    "sin_doy",
+    "cos_doy",
+    "tmax_lag1",
+    "tmax_lag2",
+    "tmax_lag3",
+    "tmax_lag7",
+    "tmin_lag1",
+    "precip_lag1",
+    "tmax_roll7"
+  ],
+  "metrics_test": {
+    "baseline_persistence": {
+      "mae": 0.94,
+      "rmse": 1.198
+    },
+    "baseline_climatology": {
+      "mae": 1.32,
+      "rmse": 1.686
+    },
+    "model_gbt": {
+      "mae": 0.917,
+      "rmse": 1.182
+    }
+  },
+  "model_vs_persistence_mae_improvement_pct": 2.4
+}

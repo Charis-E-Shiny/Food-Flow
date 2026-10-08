@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest run",
+    "ingest:weather": "node scripts/ingest-weather.mjs",
+    "ingest:market": "node scripts/ingest-market.mjs",
+    "ml:train": "python ml/train.py"
   },
   "dependencies": {
     "framer-motion": "11.11.17",
@@ -30,6 +34,7 @@
     "postcss": "8.4.49",
     "tailwindcss": "3.4.15",
     "typescript": "5.6.3",
-    "vite": "5.4.11"
+    "vite": "5.4.11",
+    "vitest": "^2.1.8"
   }
 }
