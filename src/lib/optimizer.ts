@@ -141,6 +141,72 @@ export function objectiveOf(
   );
 }
 
+// -------------------------------------------------------------------
+// Baselines for evaluation (item 5). Each respects capacity and
+// conserves quantity; they differ only in the ORDER they fill.
+// -------------------------------------------------------------------
+
+type SimpleLeg = { nodeId: string; quantityT: number };
+
+function fillInOrder(supplyT: number, ordered: OptInput[]): SimpleLeg[] {
+  let remaining = supplyT;
+  const legs: SimpleLeg[] = [];
+  for (const d of ordered) {
+    if (remaining <= 1e-9) break;
+    const q = +Math.min(d.capacityT, remaining).toFixed(2);
+    if (q > 0) legs.push({ nodeId: d.id, quantityT: q });
+    remaining = +(remaining - q).toFixed(6);
+  }
+  return legs;
+}
+
+/** Baseline A — nearest feasible destination first (ignores value). */
+export function allocateNearestFeasible(supplyT: number, dests: OptInput[]): SimpleLeg[] {
+  return fillInOrder(supplyT, [...dests].sort((a, b) => a.distanceKm - b.distanceKm));
+}
+
+/** Baseline B — greedy by static per-tonne value (no diminishing returns). */
+export function allocateGreedyValue(supplyT: number, dests: OptInput[], usableWindowHours: number): SimpleLeg[] {
+  const val = (d: OptInput) => baseValuePerT(d, usableWindowHours) - d.transportCostPerT;
+  return fillInOrder(supplyT, [...dests].sort((a, b) => val(b) - val(a)));
+}
+
+export interface AllocEval {
+  allocatedT: number;
+  residualSupplyT: number; // food not placed anywhere
+  unfilledCapacityT: number; // demand headroom left unmet
+  capacityViolations: number; // legs exceeding capacity (must be 0)
+  conservationOK: boolean; // Σ legs == allocatedT and ≤ supply
+  objectiveValue: number;
+}
+
+/** Evaluate any allocation against the constraints + objective. */
+export function evaluateAllocation(
+  legs: SimpleLeg[],
+  dests: OptInput[],
+  supplyT: number,
+  usableWindowHours: number,
+): AllocEval {
+  const byId = new Map(dests.map((d) => [d.id, d]));
+  const allocByNode = new Map<string, number>();
+  let capacityViolations = 0;
+  for (const l of legs) allocByNode.set(l.nodeId, (allocByNode.get(l.nodeId) ?? 0) + l.quantityT);
+  for (const [id, q] of allocByNode) {
+    const cap = byId.get(id)?.capacityT ?? 0;
+    if (q > cap + 1e-6) capacityViolations++;
+  }
+  const allocatedT = +legs.reduce((a, l) => a + l.quantityT, 0).toFixed(1);
+  const totalCap = dests.reduce((a, d) => a + d.capacityT, 0);
+  return {
+    allocatedT,
+    residualSupplyT: +Math.max(0, supplyT - allocatedT).toFixed(1),
+    unfilledCapacityT: +Math.max(0, totalCap - allocatedT).toFixed(1),
+    capacityViolations,
+    conservationOK: allocatedT <= supplyT + 1e-6 && capacityViolations === 0,
+    objectiveValue: objectiveOf(legs, dests, usableWindowHours),
+  };
+}
+
 /** Adapt the app's forecast + demand nodes to optimizer inputs. */
 export function toOptInputs(nodes: DemandNode[]): OptInput[] {
   return nodes.map((n) => ({

@@ -7,15 +7,24 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Leaf, Recycle, Wheat } from "lucide-react";
+import { ChevronRight, Info, Leaf, Recycle, Wheat } from "lucide-react";
 import { PageHead } from "@/components/layout/PageHead";
 import { Card, SectionTitle, Badge } from "@/components/ui";
 import { StatTile } from "@/components/ui/StatTile";
 import { Counterfactual } from "./Counterfactual";
 import { IMPACT_METRICS } from "@/data/scenario";
 import { IMPACT_TREND } from "@/data/mockData";
-import { compact } from "@/lib/format";
+import { CHAIN, IMPACT_ASSUMPTIONS } from "@/data/delivery";
+import { compact, tonnes } from "@/lib/format";
 import type { ImpactMetric } from "@/types";
+
+const STAGES: { key: keyof typeof CHAIN; label: string }[] = [
+  { key: "predictedT", label: "Predicted" },
+  { key: "allocatedT", label: "Allocated" },
+  { key: "dispatchedT", label: "Dispatched" },
+  { key: "receivedT", label: "Received" },
+  { key: "verifiedUsedT", label: "Verified-used" },
+];
 
 const OUTCOMES = [
   { title: "Food security", icon: Wheat, body: "Surplus routed to community kitchens and food banks inside the usable window — edible food reaches people instead of landfill." },
@@ -32,12 +41,52 @@ export default function ImpactCenter() {
         sub="What difference did we make? Every metric answers what changed because FoodFlow intervened."
       />
 
-      {/* Metric grid */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+      {/* Quantity chain — distinguishes measured stages from projection */}
+      <Card className="p-5">
+        <SectionTitle
+          eyebrow="Quantity chain · batch KF-TOM-1026"
+          title="Predicted → allocated → dispatched → received → verified-used"
+          sub="Only received & verified-used are confirmed. Impact below is projected from the allocation plan, not measured."
+          right={<Badge tone="neutral">{CHAIN.verifiedLegs}/{CHAIN.totalLegs} legs verified</Badge>}
+        />
+        <div className="mt-4 flex flex-wrap items-stretch gap-2">
+          {STAGES.map((s, i) => {
+            const confirmed = s.key === "receivedT" || s.key === "verifiedUsedT";
+            return (
+              <div key={s.key} className="flex items-center gap-2">
+                <div className={"rounded-xl border px-4 py-2.5 text-center " + (confirmed ? "border-ok/30 bg-ok-soft" : "border-line bg-surface-2")}>
+                  <div className="nums text-lg font-bold text-ink">{tonnes(CHAIN[s.key] as number)}</div>
+                  <div className="text-[11px] text-ink-3">{s.label}{confirmed ? " ✓" : ""}</div>
+                </div>
+                {i < STAGES.length - 1 && <ChevronRight size={16} className="shrink-0 text-ink-3" />}
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* Projected impact metrics */}
+      <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-ink">
+        Projected impact
+        <Badge tone="warn" className="px-1.5 py-0.5 text-[10px]">Projection · model simulation</Badge>
+      </div>
+      <div className="mt-2 grid grid-cols-2 gap-3 lg:grid-cols-3">
         {IMPACT_METRICS.map((m) => (
           <ImpactTile key={m.id} m={m} />
         ))}
       </div>
+
+      {/* Assumptions disclosure */}
+      <Card className="mt-4 p-4">
+        <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-3">
+          <Info size={13} /> Assumptions behind these figures
+        </div>
+        <ul className="mt-2 grid gap-1.5 text-sm text-ink-2 sm:grid-cols-2">
+          {IMPACT_ASSUMPTIONS.map((a) => (
+            <li key={a} className="flex gap-2"><span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-ink-3" />{a}</li>
+          ))}
+        </ul>
+      </Card>
 
       {/* Counterfactual */}
       <div className="mt-4">

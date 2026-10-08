@@ -4,36 +4,12 @@ import { Check, Clock, PackageCheck, Timer } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PageHead } from "@/components/layout/PageHead";
 import { Card, SectionTitle, Badge, Button } from "@/components/ui";
-import { RECIPIENTS, DEMAND_NODES } from "@/data/mockData";
-import { KOLAR_SCENARIO } from "@/data/scenario";
-import { transitLossFraction } from "@/lib/engine";
+import { RECIPIENTS } from "@/data/mockData";
+import { RECON, CHAIN, type ReconStatus } from "@/data/delivery";
 import { tonnes, hours } from "@/lib/format";
 import type { Recipient } from "@/types";
 
-// ---- Delivery reconciliation for the active batch -------------
-type ReconStatus = "received" | "in_transit" | "dispatched";
-const RECON_STATUS: Record<string, ReconStatus> = {
-  "dn-kolar-local": "received",
-  "dn-community-kitchens": "received",
-  "dn-blr-market": "in_transit",
-  "dn-mysuru-processor": "dispatched",
-};
-
-const RECON = KOLAR_SCENARIO.allocation.legs.map((leg) => {
-  const node = DEMAND_NODES.find((n) => n.id === leg.nodeId)!;
-  const st = RECON_STATUS[leg.nodeId] ?? "dispatched";
-  const dispatched = leg.quantityT;
-  const received = st === "received" ? +(leg.quantityT * (node.usableAbsorptionPct / 100) * (1 - transitLossFraction(node.distanceKm))).toFixed(1) : null;
-  const discrepancy = received != null ? +(leg.quantityT - received).toFixed(1) : null;
-  return { leg, st, dispatched, received, discrepancy };
-});
-const RECON_SUM = {
-  allocated: +RECON.reduce((a, r) => a + r.leg.quantityT, 0).toFixed(1),
-  dispatched: +RECON.reduce((a, r) => a + r.dispatched, 0).toFixed(1),
-  received: +RECON.reduce((a, r) => a + (r.received ?? 0), 0).toFixed(1),
-  discrepancy: +RECON.reduce((a, r) => a + (r.discrepancy ?? 0), 0).toFixed(1),
-  verified: RECON.filter((r) => r.received != null).length,
-};
+const RECON_DISCREPANCY = +RECON.reduce((a, r) => a + (r.discrepancyT ?? 0), 0).toFixed(1);
 
 const reconTone: Record<ReconStatus, { tone: "ok" | "warn" | "demand"; label: string }> = {
   received: { tone: "ok", label: "Received" },
@@ -90,14 +66,14 @@ export default function RecipientView() {
           <span className="text-right">Status</span>
         </div>
         {RECON.map((r) => {
-          const m = reconTone[r.st];
+          const m = reconTone[r.status];
           return (
-            <div key={r.leg.nodeId} className="grid grid-cols-2 gap-2 border-b border-line px-5 py-3 text-sm last:border-b-0 sm:grid-cols-[1.6fr_repeat(4,0.8fr)_0.9fr]">
-              <span className="font-medium text-ink">{r.leg.nodeName}</span>
-              <span className="nums text-right text-ink-2">{tonnes(r.leg.quantityT)}</span>
-              <span className="nums text-right text-ink-2">{tonnes(r.dispatched)}</span>
-              <span className="nums text-right font-semibold text-ink">{r.received != null ? tonnes(r.received) : "—"}</span>
-              <span className={"nums text-right " + (r.discrepancy ? "text-warn" : "text-ink-3")}>{r.discrepancy != null ? (r.discrepancy > 0 ? `−${r.discrepancy.toFixed(1)}` : "0.0") : "—"}</span>
+            <div key={r.nodeId} className="grid grid-cols-2 gap-2 border-b border-line px-5 py-3 text-sm last:border-b-0 sm:grid-cols-[1.6fr_repeat(4,0.8fr)_0.9fr]">
+              <span className="font-medium text-ink">{r.nodeName}</span>
+              <span className="nums text-right text-ink-2">{tonnes(r.allocatedT)}</span>
+              <span className="nums text-right text-ink-2">{tonnes(r.dispatchedT)}</span>
+              <span className="nums text-right font-semibold text-ink">{r.receivedT != null ? tonnes(r.receivedT) : "—"}</span>
+              <span className={"nums text-right " + (r.discrepancyT ? "text-warn" : "text-ink-3")}>{r.discrepancyT != null ? (r.discrepancyT > 0 ? `−${r.discrepancyT.toFixed(1)}` : "0.0") : "—"}</span>
               <span className="flex justify-end sm:block sm:text-right">
                 <Badge tone={m.tone} dot className="px-1.5 py-0.5 text-[10px]">{m.label}</Badge>
               </span>
@@ -106,11 +82,11 @@ export default function RecipientView() {
         })}
         <div className="grid grid-cols-2 gap-2 bg-surface-2 px-5 py-3 text-sm sm:grid-cols-[1.6fr_repeat(4,0.8fr)_0.9fr]">
           <span className="font-semibold text-ink">Total</span>
-          <span className="nums text-right font-semibold text-ink">{tonnes(RECON_SUM.allocated)}</span>
-          <span className="nums text-right font-semibold text-ink">{tonnes(RECON_SUM.dispatched)}</span>
-          <span className="nums text-right font-semibold text-ink">{tonnes(RECON_SUM.received)}</span>
-          <span className="nums text-right font-semibold text-warn">−{RECON_SUM.discrepancy.toFixed(1)}</span>
-          <span className="text-right text-[11px] text-ink-3">{RECON_SUM.verified}/{RECON.length} verified</span>
+          <span className="nums text-right font-semibold text-ink">{tonnes(CHAIN.allocatedT)}</span>
+          <span className="nums text-right font-semibold text-ink">{tonnes(CHAIN.dispatchedT)}</span>
+          <span className="nums text-right font-semibold text-ink">{tonnes(CHAIN.receivedT)}</span>
+          <span className="nums text-right font-semibold text-warn">−{RECON_DISCREPANCY.toFixed(1)}</span>
+          <span className="text-right text-[11px] text-ink-3">{CHAIN.verifiedLegs}/{CHAIN.totalLegs} verified</span>
         </div>
       </Card>
 

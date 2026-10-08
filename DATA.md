@@ -37,9 +37,13 @@ for the move from prototype to a real data-backed system.
 
 - **Resource:** `9ef84268-d588-465a-a308-a864a43d0070`
   ("Variety-wise Daily Market Prices of Commodities").
-- **Tested from this environment:** `GET api.data.gov.in/...` → **HTTP 000
-  (connection failed)**. `data.gov.in` (the website) resolves, but the **API
-  host `api.data.gov.in` is not reachable** from the build environment.
+- **Re-tested (deep diagnosis):** DNS **resolves** (`api.data.gov.in` →
+  `164.100.61.198`), but the **TCP connection to port 443 is actively refused**:
+  - `curl`: *"Failed to connect to api.data.gov.in port 443 … Could not connect to server"*
+  - `python urllib`: *"WinError 10061 … the target machine actively refused it"*
+  - General egress is fine (Open-Meteo succeeds over HTTPS), so this is
+    **host-specific network blocking** from this build environment — not an
+    auth error and not bypassable here. No workaround was fabricated.
 - **No market data was fabricated.** `npm run ingest:market` makes a real
   request and, on failure, writes `public/data/market-source-status.json`
   documenting the error — it never writes invented records.
@@ -78,6 +82,71 @@ claimed as trained.**
 Run: `npm run ml:train` → `ml/artifacts/{model.joblib,metrics.json,features.json}`.
 
 ---
+
+## Operational surplus target (definition & data requirements)
+
+**Definition.** For a (location, crop, horizon *h*):
+
+```
+Surplus(h) = max(0,  PredictedArrivals(h) − AbsorptiveDemand(h))
+```
+
+the tonnage expected at mandis within *h* that local + contracted demand cannot
+absorb at a non-distress price.
+
+**Can public data support a supervised model?** Investigated — **not fully:**
+
+| Component | Source | Status |
+|---|---|---|
+| `PredictedArrivals(h)` | Agmarknet **daily arrivals** per mandi×commodity | forecastable **if the feed is reachable** (it isn't here) |
+| `AbsorptiveDemand(h)` | no direct feed | only a **proxy** (cleared volume at ≥ threshold price, or processor/retail intake) |
+| **Ground-truth surplus/waste labels** | — | **not publicly available** |
+
+**Conclusion:** a supervised surplus model **cannot** be honestly trained from
+public data (no labels). FoodFlow therefore uses a **transparent heuristic**
+(`calculateSurplusRisk` = sum of explainable factor contributions from arrivals,
+demand, temperature, usable window, local capacity), clearly labeled **Estimate**
+in the UI (`provenance: heuristic`). To train & validate a supervised surplus
+model later, the following additional data is required:
+
+1. Daily mandi **arrivals** (Agmarknet) — for the arrivals forecast.
+2. A **demand/offtake proxy** — cleared volume at non-distress price, or
+   processor/retail contracted intake.
+3. **Ground-truth labels** — FPO/APMC unsold-lot tonnage, cold-storage
+   rejections, or reported per-lot post-harvest loss.
+4. Linking keys: `mandi × commodity × date` across all three.
+
+## Allocation optimizer — evaluation (item 5)
+
+Benchmarked against **two** baselines across 7 scenarios (varied supply,
+capacity, distance, price, spoilage window) in
+`src/lib/__tests__/allocator-bench.test.ts` (`npm run test`):
+
+- **Baseline A — nearest-feasible** (distance-only): fill the closest
+  destination with capacity first.
+- **Baseline B — greedy-value** (static per-tonne value, no diminishing returns).
+- **Optimizer** — marginal-value water-filling (concave objective).
+
+**Verified for every strategy & scenario:** 0 capacity violations, quantity
+conservation holds, `allocatedT = min(supply, Σ capacity)`. Reported per
+scenario: objective value, residual supply (unplaced food) and unfilled
+capacity (unmet demand headroom).
+
+**Actual results (objective = expected realized value net of transport & spoilage):**
+
+| Scenario | nearest | greedy-value | optimizer | opt vs best baseline |
+|---|--:|--:|--:|--:|
+| canonical (Kolar) | 141,988 | 141,988 | 141,988 | 0% |
+| near-low-value vs far-high-value | 82,557 | 100,881 | **100,881** | **+22% vs nearest** |
+| tight spoilage window | 103,734 | 103,734 | **104,163** | +0.4% |
+| supply ≪ capacity | 46,760 | 46,760 | 46,770 | ~0% |
+
+**Honest reading:** the optimizer is **provably ≥ both baselines** in every
+scenario (globally optimal for the concave objective). It is **materially better
+than the naive nearest-feasible baseline** when value and distance conflict
+(+22%), and **comparable to greedy-value** for these separable cases (the
+diminishing-returns effect only binds modestly at these capacity scales). No
+superiority is claimed beyond what the benchmark shows.
 
 ## Surplus is NOT price, and predicted surplus is NOT verified waste
 
