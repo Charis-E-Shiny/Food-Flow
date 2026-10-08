@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   FoodFlow design tokens
+   Single source of truth for color. Components reference the
+   Tailwind color names (brand, risk, warn, demand, ink, …) which
+   map to these channels. Values are space-separated RGB channels
+   so Tailwind's <alpha-value> opacity syntax works.
+   ============================================================ */
+:root {
+  --c-canvas: 247 246 242; /* warm off-white */
+  --c-surface: 255 255 255;
+  --c-surface-2: 250 249 245;
+  --c-line: 229 227 219;
+  --c-line-strong: 213 210 199;
+  --c-ink: 26 29 26; /* charcoal */
+  --c-ink-2: 74 80 73;
+  --c-ink-3: 122 127 119;
+
+  --c-brand: 27 94 63; /* deep agricultural green */
+  --c-brand-strong: 18 66 44;
+  --c-brand-soft: 140 197 163;
+  --c-brand-tint: 232 240 233;
+
+  --c-risk: 196 59 46; /* red — genuine risk only */
+  --c-risk-soft: 248 227 224;
+  --c-warn: 199 122 10; /* restrained amber */
+  --c-warn-soft: 250 238 219;
+  --c-demand: 45 107 143; /* blue — demand / recipient capacity */
+  --c-demand-soft: 224 236 243;
+  --c-ok: 32 122 72; /* stable green */
+  --c-ok-soft: 224 238 229;
+
+  --ring: 27 94 63;
+  color-scheme: light;
+}
+
+/* Reduced-motion users: neutralize decorative animation. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+* {
+  border-color: rgb(var(--c-line));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: rgb(var(--c-canvas));
+  color: rgb(var(--c-ink));
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+}
+
+/* Tabular numbers everywhere numbers matter. */
+.nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Focus visibility — accessible, consistent. */
+:where(a, button, [role="button"], input, select, [tabindex]):focus-visible {
+  outline: 2px solid rgb(var(--ring));
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Thin, restrained scrollbars for panels. */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--c-line-strong)) transparent;
+}
+.scroll-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: rgb(var(--c-line-strong));
+  border-radius: 999px;
+}
+
+/* Subtle soil-grain gradient used behind hero / map canvases. */
+.bg-field {
+  background-color: rgb(var(--c-canvas));
+  background-image:
+    radial-gradient(42rem 42rem at 92% -8%, rgb(var(--c-brand-tint) / 0.5), transparent 62%),
+    radial-gradient(34rem 30rem at -6% 4%, rgb(var(--c-warn-soft) / 0.5), transparent 58%),
+    radial-gradient(26rem 26rem at 60% 110%, rgb(var(--c-surface-2)), transparent 60%);
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.65;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+.animate-pulse-ring {
+  animation: pulse-ring 2.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+@keyframes flow-dash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+/* Leaflet theming */
+.leaflet-container {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  background: rgb(var(--c-surface-2));
+}
+.leaflet-tooltip.ff-tip {
+  background: rgb(var(--c-surface));
+  border: 1px solid rgb(var(--c-line));
+  border-radius: 10px;
+  box-shadow: 0 12px 40px -8px rgb(20 30 20 / 0.22);
+  color: rgb(var(--c-ink));
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.leaflet-tooltip.ff-tip::before {
+  border-top-color: rgb(var(--c-surface));
+}
+.leaflet-bar,
+.leaflet-control-zoom {
+  border: 1px solid rgb(var(--c-line)) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgb(20 30 20 / 0.08) !important;
+}
+.leaflet-control-zoom a {
+  background: rgb(var(--c-surface));
+  color: rgb(var(--c-ink-2));
+  border-color: rgb(var(--c-line)) !important;
+}
+.leaflet-control-zoom a:hover {
+  background: rgb(var(--c-surface-2));
+  color: rgb(var(--c-ink));
+}
+.leaflet-control-attribution {
+  background: rgb(var(--c-surface) / 0.85) !important;
+  color: rgb(var(--c-ink-3)) !important;
+  font-size: 10px !important;
+}
+.leaflet-control-attribution a {
+  color: rgb(var(--c-ink-2)) !important;
+}
+.flow-dash {
+  stroke-dasharray: 2 6;
+  animation: flow-dash 1s linear infinite;
+}

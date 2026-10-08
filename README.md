@@ -1,0 +1,441 @@
+<div align="center">
+
+# 🌾 FoodFlow
+
+### Predict Surplus. Prevent Waste. Route Food Where It's Needed.
+
+**A predictive food-allocation platform for agricultural surplus.**
+FoodFlow forecasts *where* agricultural surplus will occur, scores its urgency and
+perishability, and optimizes *where it should go* — before the usable window closes.
+
+<br/>
+
+![React](https://img.shields.io/badge/React-18-087ea4?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)
+![Tailwind](https://img.shields.io/badge/TailwindCSS-3-38bdf8?logo=tailwindcss&logoColor=white)
+![Leaflet](https://img.shields.io/badge/Leaflet-1.9-199900?logo=leaflet&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-16a34a)
+
+</div>
+
+---
+
+## ✨ The one-line thesis
+
+> **Mandi intelligence tells us what is *likely to happen* to the crop.**
+> **FoodFlow decides what *should happen* to the food.**
+> **Traceability + reconciliation prove what *actually happened* afterward.**
+
+Existing systems are **reactive** — they ask *"where can today's surplus go?"* only
+once food is already surplus and value is eroding. FoodFlow adds a **predictive
+pre-surplus intervention layer** and **multi-destination allocation optimization**:
+
+> *"Where will surplus occur next, how much is at risk, and where should it go
+> before it becomes waste?"*
+
+---
+
+## 📑 Table of contents
+
+- [What's inside](#-whats-inside)
+- [System architecture](#-system-architecture)
+- [The FoodFlow pipeline](#-the-foodflow-pipeline)
+- [Application map & UI/UX](#-application-map--uiux)
+- [Data model](#-data-model)
+- [The decision engine](#-the-decision-engine)
+- [Canonical scenario](#-canonical-scenario-kolar-tomato)
+- [Tech stack](#-tech-stack)
+- [Project structure](#-project-structure)
+- [Routes](#-routes)
+- [Getting started](#-getting-started)
+- [Map configuration (API key)](#-map-configuration-api-key)
+- [Deployment](#-deployment-vercel)
+- [What's simulated vs. production](#-whats-simulated-vs-production)
+- [Roadmap](#-roadmap)
+- [Credits & attribution](#-credits--attribution)
+
+---
+
+## 🧩 What's inside
+
+FoodFlow is a complete, working product prototype — not a landing page — built around
+a single connected workflow and four supporting tools.
+
+| Layer | Capability |
+|---|---|
+| **Market intelligence** | Agmarknet-style modal price history, ML-style price forecast with confidence band, mandi arrivals, **volatility scoring**, **anomaly detection**, nearby-market comparison, seasonality. |
+| **Prediction** | Future **surplus** from supply-vs-demand imbalance, **spoilage / usable-window risk**, explainable risk factors (SHAP-style contributions). |
+| **Decision** | **Sell / Hold / Redirect** logic, **destination rescue-priority scoring**, **multi-destination allocation optimization**. |
+| **Execution** | Route/operations tracking, live shipment legs & corridors. |
+| **Trust** | **QR batch identity**, tamper-evident supply-chain event ledger, **delivery verification** (allocated vs dispatched vs received). |
+| **Impact** | Counterfactual (with vs. without FoodFlow), food preserved, farmer value protected, meals, emissions avoided. |
+| **Signals** | Live predictive **alert ticker** + notification feed ("Onion ↑ ~12% · Nashik · 48h"). |
+
+---
+
+## 🏛 System architecture
+
+FoodFlow is a client-side React SPA with a clean, layered architecture. Every screen
+reads from a **single computed scenario selector**, so no two views can disagree.
+
+```mermaid
+flowchart TB
+    subgraph DATA["📦 Data layer (deterministic mock)"]
+        MD["mockData.ts<br/>forecasts · nodes · batch · alerts · commodities"]
+        GEO["geo.ts + india.states.json<br/>projection & geometry"]
+        MKT["market.ts<br/>seeded price / arrivals / volatility"]
+    end
+
+    subgraph ENGINE["⚙️ Decision engine (pure functions)"]
+        E1["calculateSurplusRisk()"]
+        E2["calculateSpoilageRisk()"]
+        E3["calculateDestinationScore()"]
+        E4["calculateAllocation()"]
+        E5["calculateCounterfactual()"]
+    end
+
+    subgraph SELECT["🎯 Scenario selector"]
+        SC["scenario.ts<br/>KOLAR_SCENARIO · PORTFOLIO · IMPACT_METRICS"]
+    end
+
+    subgraph UI["🖥 UI layer (React + Router)"]
+        SHELL["AppShell · TopNav · AlertTicker"]
+        PAGES["9 workflow pages + 4 tools"]
+        COMP["SurplusMap (Leaflet) · charts · UI kit"]
+    end
+
+    DATA --> ENGINE --> SELECT --> UI
+    GEO --> COMP
+    MKT --> PAGES
+    SELECT --> PAGES
+```
+
+**Design principle — one source of truth.** `scenario.ts` composes the engine over the
+mock data once; the Command Overview, Optimization, Counterfactual and Impact screens
+all consume the same computed object. Change a model weight in one place and every
+screen updates consistently.
+
+---
+
+## 🔄 The FoodFlow pipeline
+
+The product is one continuous system, not a collection of dashboards:
+
+```mermaid
+flowchart LR
+    A["🌦 Mandi + weather<br/>+ demand"] --> B["📈 Price / supply<br/>forecast"]
+    B --> C["🌾 Surplus<br/>prediction"]
+    C --> D["⏳ Spoilage<br/>risk"]
+    D --> E["🗺 Demand<br/>map"]
+    E --> F["🎯 FoodFlow<br/>optimization"]
+    F --> G["🚚 Routing"]
+    G --> H["🔗 QR /<br/>traceability"]
+    H --> I["✅ Delivery<br/>verification"]
+    I --> J["📊 Impact"]
+
+    style C fill:#e8f0e9,stroke:#1b5e3f
+    style F fill:#e8f0e9,stroke:#1b5e3f
+    style J fill:#e8f0e9,stroke:#1b5e3f
+```
+
+Each stage maps to a page the user can walk through end to end.
+
+---
+
+## 🖼 Application map & UI/UX
+
+### Navigation
+
+A single sticky **top navigation** (no sidebar). The nine workflow stages sit in the
+centre as clean label pills with the current stage highlighted; the four secondary
+tools live under a compact **Tools** menu. A **predictive-alert ticker** runs under the
+header, and a **notification bell** holds the full signal feed.
+
+```mermaid
+flowchart LR
+    LOGO["FoodFlow"] --- NAV["Overview · Predict · Risk · Demand · Optimize · Route · Trace · Verify · Impact"] --- T["Tools ▾"] --- B["🔔"] --- P["Profile ▾"]
+    T -.-> T1["Scenario Simulator"]
+    T -.-> T2["Network Map"]
+    T -.-> T3["Farmer View"]
+    T -.-> T4["Market"]
+```
+
+### Screens — each answers one question
+
+| # | Screen | Route | Answers… |
+|---|--------|-------|----------|
+| 00 | **Overview** | `/dashboard` | What's happening across the network? |
+| 01 | **Predict** | `/predict` | Where will surplus happen? |
+| 02 | **Assess Risk** | `/risk` | How serious is it? |
+| 03 | **Find Demand** | `/demand` | Who needs the food? |
+| 04 | **Optimize** | `/optimize` | Where should it go? |
+| 05 | **Route** | `/operations` | Is it moving? |
+| 06 | **Trace** | `/trace` | Where has it been? |
+| 07 | **Verify** | `/verify` | Did it arrive? |
+| 08 | **Measure Impact** | `/impact` | What difference did we make? |
+| — | Event detail | `/event/:id` | Full market intelligence + decision for one event |
+| 🛠 | Scenario Simulator | `/simulator` | What-if sliders → live risk |
+| 🛠 | Network Map | `/map` | Geographic surplus & demand |
+| 🛠 | Farmer View | `/farmer` | A grower's mobile-first view |
+| 🛠 | Market | `/marketplace` | Live commodity prices + buyers/orgs |
+
+### Design system
+
+- **Tokens** — all colour defined as CSS variables (`--c-brand`, `--c-risk`, …) mapped
+  into Tailwind, so the palette is single-source and theme-ready.
+- **Palette** — deep agricultural green, warm off-white canvas, charcoal ink, restrained
+  amber for warnings, red reserved for genuine risk, blue for demand/capacity.
+- **Typography** — Inter (UI) + IBM Plex Mono (figures), with tabular numbers everywhere
+  numbers matter.
+- **Motion** — Framer Motion used to communicate causality (allocation flow, count-ups,
+  counterfactual transitions), never as decoration; respects `prefers-reduced-motion`.
+- **Progressive disclosure** — rows and cards show *numbers + labels + status + actions*;
+  long reasoning is hidden behind expand/“view details”.
+- **Accessibility** — semantic HTML, keyboard navigation, visible focus rings, ARIA on
+  controls, sufficient contrast.
+- **Responsive** — designed for desktop (primary), tablet and 390 px mobile.
+
+---
+
+## 🗃 Data model
+
+```mermaid
+erDiagram
+    FarmCluster ||--o{ SurplusForecast : produces
+    SurplusForecast ||--|{ Factor : "explained by"
+    SurplusForecast ||--|| MarketSeries : "has price intel"
+    SurplusForecast ||--o{ AllocationLeg : "optimized into"
+    DemandNode ||--o{ AllocationLeg : "receives"
+    AllocationResult ||--|{ AllocationLeg : contains
+    Batch ||--|{ TraceEvent : records
+    AllocationLeg ||--o| Reconciliation : "verified by"
+    SurplusForecast ||--|| CounterfactualState : "models"
+```
+
+Core entities (`src/types`): `FarmCluster`, `SurplusForecast` (+ `Factor[]`),
+`DemandNode`, `AllocationResult`/`AllocationLeg`, `Batch`/`TraceEvent`, `Recipient`,
+`Commodity`, `Alert`, `ImpactMetric`, `CounterfactualState`.
+
+All data is **deterministic** — no `Math.random()` at call time — so a given scenario
+renders identically every run. Market series use a seeded PRNG keyed by forecast id.
+
+---
+
+## ⚙️ The decision engine
+
+Pure, explainable, swappable functions in `src/lib/engine.ts`. Each is a transparent
+stand-in for a production model.
+
+**Destination rescue-priority score** — deliberately *not* price-maximizing:
+
+```
+score = 0.40·demandPull + 0.34·absorptionCertainty + 0.14·needWeight + 0.12·proximity
+```
+
+**Allocation** — greedy by suitability, capacity-bounded: fill the highest-scoring
+destinations first, up to each one's absorbable capacity, until the surplus is cleared.
+
+**Counterfactual** — redirected tonnage is discounted by each destination's absorption
+certainty **and** in-transit/handling loss (`distanceKm / 1440`), yielding the
+effectively-preserved volume vs. a do-nothing baseline.
+
+Also: `calculateSurplusRisk`, `calculateSpoilageRisk`, `calculateFoodFlowScore`,
+`calculateFarmerValue`, `calculateMealsEquivalent`, `calculatePotentialWasteAvoided`.
+
+---
+
+## 🍅 Canonical scenario (Kolar Tomato)
+
+One scenario drives the whole demo, and the engine output is verified to match it exactly:
+
+| | |
+|---|---|
+| Predicted surplus | **15.2 T** |
+| Forecast horizon | **72 h** |
+| Waste risk | **87 / 100** |
+| Arrivals / demand | **+38% / −12%** · 32°C · 72h window |
+| **Allocation** | Community **3.2T** · Bengaluru market **4.0T** · Mysuru processor **5.0T** · Kolar local **3.0T** |
+| Destination scores | 95 · 92 · 81 · 73 → **optimization score 85** |
+| **Redirected** | **13.4 T** in-window · residual **1.8 T** |
+| **Preserved** | **6.9 T** · farmer value **₹1.66 L** · **17.3 K** meals · 17.9 tCO₂e avoided |
+
+Scope: a pan-India network of **14 surplus events** across 11 states and **~32 commodities**.
+
+---
+
+## 🛠 Tech stack
+
+| Concern | Choice |
+|---|---|
+| Framework | React 18 + TypeScript (strict) |
+| Build | Vite 5 |
+| Styling | Tailwind CSS 3 (+ CSS-variable design tokens) |
+| Routing | React Router 6 (lazy-loaded routes, protected app shell) |
+| Maps | Leaflet + react-leaflet (CARTO / OSM tiles; optional MapTiler key) |
+| Charts | Recharts |
+| Motion | Framer Motion |
+| Icons | lucide-react |
+| Auth | Lightweight client-side session (localStorage) — swappable for a real API |
+
+---
+
+## 📁 Project structure
+
+```
+FoodFlow/
+├── public/                 # favicon, _redirects, robots.txt
+├── src/
+│   ├── components/
+│   │   ├── layout/         # TopNav, AppShell, AlertTicker, NotificationBell
+│   │   ├── map/            # SurplusMap (Leaflet)
+│   │   ├── flow/           # FoodFlow signature diagram
+│   │   └── ui/             # Card, Badge, Button, StatTile, Meter, Img …
+│   ├── data/               # mockData, scenario (selector), market, geo, workflow, images
+│   ├── features/           # one folder per screen
+│   │   ├── overview/ predict(surplus-radar)/ risk/ need-map/ optimization/
+│   │   ├── operations/ traceability/ recipient(verify)/ impact/ event-detail/
+│   │   ├── simulator/ network-map/ farmer/ marketplace/
+│   │   ├── landing/        # public marketing site
+│   │   └── auth/           # login / signup
+│   ├── hooks/              # useCountUp
+│   ├── lib/                # engine, auth, format, cn
+│   ├── types/              # domain model
+│   ├── App.tsx             # routes
+│   └── main.tsx
+├── vercel.json             # SPA rewrites + asset caching
+├── .env.example            # VITE_MAPTILER_KEY
+└── tailwind.config.js
+```
+
+---
+
+## 🧭 Routes
+
+**Public:** `/` (landing) · `/login` · `/signup`
+**Workflow (auth-gated):** `/dashboard` `/predict` `/risk` `/demand` `/optimize`
+`/operations` `/trace` `/verify` `/impact` · `/event/:id`
+**Tools:** `/simulator` `/map` `/farmer` `/marketplace`
+
+Old paths redirect automatically (`/command → /dashboard`, etc.).
+
+---
+
+## 🚀 Getting started
+
+**Prerequisites:** Node.js 18+ and npm.
+
+```bash
+# install
+npm install
+
+# run the dev server (http://localhost:5173)
+npm run dev
+
+# type-check + production build
+npm run build
+
+# preview the production build
+npm run preview
+```
+
+> Sign-in is a sandbox — any email and password are accepted, and the session lives
+> only in your browser (nothing is stored or sent anywhere).
+
+---
+
+## 🗺 Map configuration (API key)
+
+The map shows **India** by default and works **with no API key** using free
+[CARTO Positron](https://carto.com/basemaps/) tiles (OpenStreetMap data).
+
+To use a sharper, higher-rate-limit keyed provider:
+
+1. Create a **free** account at **[cloud.maptiler.com](https://cloud.maptiler.com)**.
+2. Go to **Account → API keys** and copy your key.
+3. Create a `.env` file (copy from `.env.example`) and set:
+   ```
+   VITE_MAPTILER_KEY=your_key_here
+   ```
+4. Restart `npm run dev`. The map auto-switches to MapTiler.
+
+> Alternatives you can drop in the same way: **Mapbox** (`api.mapbox.com`) or
+> **Stadia Maps**. Only the tile URL in `src/components/map/SurplusMap.tsx` changes.
+
+---
+
+## ☁️ Deployment (Vercel)
+
+The repo ships with `vercel.json` (SPA rewrites + immutable asset caching) and a
+Netlify `public/_redirects`, so client-side routing and deep links work on refresh.
+
+**Vercel (dashboard):** import the GitHub repo → framework **Vite** → build
+`npm run build` → output `dist`. Add `VITE_MAPTILER_KEY` under *Environment Variables*
+if you want keyed tiles. Deploy.
+
+**Vercel (CLI):**
+```bash
+npm i -g vercel
+vercel          # preview
+vercel --prod   # production
+```
+
+`vercel.json`:
+```json
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
+```
+
+---
+
+## 🔬 What's simulated vs. production
+
+This is a **prototype / sandbox**. It demonstrates *how the real system would work*.
+
+| Simulated here | Becomes in production |
+|---|---|
+| Deterministic mock forecasts & prices | Live Agmarknet feed + trained demand/price models |
+| `calculateSurplusRisk / Spoilage` | Perishability + weather ML models |
+| `calculateAllocation` (greedy) | LP / min-cost-flow solver with transport constraints |
+| Tamper-evident hashes (string) | Permissioned ledger (e.g. Hyperledger Fabric) |
+| localStorage auth | Real auth + role-based authorization |
+| Reconciliation numbers | IoT / weighbridge-verified receipts |
+
+No ML model was trained and no blockchain transaction occurred. All figures are
+clearly framed as illustrative.
+
+---
+
+## 🛣 Roadmap
+
+- [ ] Wire real Agmarknet + IMD weather feeds behind the existing interfaces
+- [ ] Replace the greedy allocator with a true optimization solver
+- [ ] Per-event optimization for every city (not just the canonical scenario)
+- [ ] Ledger integration + QR deep-link verification
+- [ ] Farmer SMS / IVR channel
+- [ ] Dark mode
+
+---
+
+## 🙏 Credits & attribution
+
+- **Map geometry** — [GADM](https://gadm.org/) via
+  [geohacker/india](https://github.com/geohacker/india), simplified.
+- **Map tiles** — [CARTO](https://carto.com/) basemaps · © OpenStreetMap contributors.
+- **Photography** — [Unsplash](https://unsplash.com) (CC).
+- **Concept inspiration** — market-intelligence patterns from MandiBhav &
+  AgriPrice-Intelligence; QR/supply-chain event model from ChainFair. FoodFlow's
+  contribution is the predictive pre-surplus + multi-destination optimization layer.
+
+---
+
+## 📄 License
+
+MIT © **skypank-coder**
+
+<div align="center">
+<br/>
+<strong>FoodFlow</strong> — predict the surplus before it happens,<br/>
+route the food before it loses value, and prove the impact afterward.
+</div>
