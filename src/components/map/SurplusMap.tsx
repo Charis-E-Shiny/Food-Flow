@@ -103,8 +103,8 @@ export function SurplusMap({
   return (
     <div className={cn("relative isolate w-full overflow-hidden rounded-2xl border border-line", aspect, className)}>
       <MapContainer
-        center={[22.8, 81]}
-        zoom={4.6}
+        center={[22.6, 81.5]}
+        zoom={4.8}
         minZoom={4}
         maxZoom={9}
         maxBounds={[

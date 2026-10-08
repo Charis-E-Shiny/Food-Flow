@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown, LogOut, Menu, Settings, User as UserIcon, X } from "lucide-react";
+import { ChevronDown, ChevronRight, LogOut, Menu, Settings, Store, User as UserIcon, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Logo } from "./Logo";
 import { useAuth } from "@/lib/auth";
@@ -30,27 +30,41 @@ export function TopNav() {
           <Logo to="/dashboard" />
         </div>
 
-        {/* Workflow stepper — clean label pills, current highlighted */}
-        <nav className="scroll-thin hidden min-w-0 flex-1 items-center justify-center gap-0.5 overflow-x-auto lg:flex" aria-label="Workflow">
-          {WORKFLOW.map((s) => {
-            const current = stepIndex(pathname) === WORKFLOW.indexOf(s);
+        {/* Workflow stepper — label pills joined by arrows to show sequence */}
+        <nav className="scroll-thin hidden min-w-0 flex-1 items-center justify-center overflow-x-auto lg:flex" aria-label="Workflow">
+          {WORKFLOW.map((s, i) => {
+            const active = stepIndex(pathname);
+            const current = active === i;
             return (
-              <NavLink
-                key={s.key}
-                to={s.to}
-                title={s.question}
-                className={cn(
-                  "shrink-0 rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-colors",
-                  current ? "bg-brand text-white shadow-card" : "text-ink-2 hover:bg-surface-2 hover:text-ink",
-                )}
-              >
-                {s.label}
-              </NavLink>
+              <div key={s.key} className="flex shrink-0 items-center">
+                {i > 0 && <ChevronRight size={13} className={cn("mx-0.5 shrink-0", i <= active ? "text-brand-soft" : "text-line-strong")} />}
+                <NavLink
+                  to={s.to}
+                  title={s.question}
+                  className={cn(
+                    "rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-colors",
+                    current ? "bg-brand text-white shadow-card" : "text-ink-2 hover:bg-surface-2 hover:text-ink",
+                  )}
+                >
+                  {s.label}
+                </NavLink>
+              </div>
             );
           })}
         </nav>
 
         <div className="flex shrink-0 items-center gap-1.5">
+          <NavLink
+            to="/marketplace"
+            className={({ isActive }) =>
+              cn(
+                "hidden items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors lg:inline-flex",
+                isActive ? "bg-brand-tint text-brand-strong" : "text-ink-2 hover:bg-surface-2 hover:text-ink",
+              )
+            }
+          >
+            <Store size={15} /> Market
+          </NavLink>
           <ToolsMenu />
           <NotificationBell />
           <ProfileMenu />
@@ -87,7 +101,7 @@ function ToolsMenu() {
       </button>
       {open && (
         <div className="absolute right-0 top-12 z-30 w-72 overflow-hidden rounded-xl border border-line bg-surface p-1.5 shadow-pop">
-          {TOOLS.map((t) => (
+          {TOOLS.filter((t) => t.to !== "/marketplace").map((t) => (
             <NavLink
               key={t.to}
               to={t.to}
