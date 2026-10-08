@@ -36,8 +36,53 @@ pre-surplus intervention layer** and **multi-destination allocation optimization
 
 ---
 
+## 🔄 How it works — at a glance
+
+```text
+        🌦  MANDI  +  WEATHER  +  DEMAND   (Agmarknet-style signals)
+                            │
+                            ▼
+   ┌─────────────────────────────────────────────────────────────────────┐
+   │   01        02         03         04         05       06       07      08 │
+   │ PREDICT → ASSESS  →  DEMAND  → OPTIMIZE →  ROUTE  → TRACE → VERIFY → IMPACT │
+   │ surplus   risk &     who       multi-      is it    chain   did it   what   │
+   │ ahead     window     needs it  destination moving?  of      arrive?  changed│
+   │           of time              allocation          custody                  │
+   └─────────────────────────────────────────────────────────────────────┘
+      │                                                                    │
+   predict the surplus ───────────────────────────────▶ prove the impact
+```
+
+> **Mandi intelligence → what's *likely* to happen · FoodFlow → what *should* happen · Traceability → what *actually* happened.**
+
+---
+
+## 🖥 Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/overview.png" alt="Command Overview" /><p align="center"><sub><b>00 · Overview</b> — network at a glance</sub></p></td>
+    <td width="50%"><img src="docs/screenshots/predict.png" alt="Predict" /><p align="center"><sub><b>01 · Predict</b> — surplus forecast board</sub></p></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/optimize.png" alt="Optimize" /><p align="center"><sub><b>04 · Optimize</b> — multi-destination allocation</sub></p></td>
+    <td><img src="docs/screenshots/network-map.png" alt="Network map" /><p align="center"><sub><b>Network Map</b> — real India tiles</sub></p></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/impact.png" alt="Impact" /><p align="center"><sub><b>08 · Impact</b> — counterfactual & outcomes</sub></p></td>
+    <td><img src="docs/screenshots/simulator.png" alt="Scenario Simulator" /><p align="center"><sub><b>Scenario Simulator</b> — live what-if</sub></p></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/market.png" alt="Market" /><p align="center"><sub><b>Market</b> — all-commodity price board</sub></p></td>
+    <td><img src="docs/screenshots/landing.png" alt="Landing" /><p align="center"><sub><b>Landing</b> — product site</sub></p></td>
+  </tr>
+</table>
+
+---
+
 ## 📑 Table of contents
 
+- [Screenshots](#-screenshots)
 - [What's inside](#-whats-inside)
 - [System architecture](#-system-architecture)
 - [The FoodFlow pipeline](#-the-foodflow-pipeline)
