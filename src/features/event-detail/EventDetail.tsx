@@ -127,7 +127,7 @@ export default function EventDetail() {
             Run the allocation optimizer to place this surplus across the best destinations.
           </p>
         </div>
-        <LinkButton to={f.id === CANONICAL_FORECAST_ID ? "/optimize" : "/optimize"} size="lg">
+        <LinkButton to={f.id === CANONICAL_FORECAST_ID ? "/optimize" : `/optimize?event=${f.id}`} size="lg">
           <Target size={18} /> Optimize rescue <ArrowRight size={16} />
         </LinkButton>
       </div>

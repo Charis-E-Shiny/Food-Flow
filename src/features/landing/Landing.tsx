@@ -19,20 +19,14 @@ import { Logo } from "@/components/layout/Logo";
 import { Badge } from "@/components/ui";
 import { Img } from "@/components/ui/Img";
 import { SurplusMap } from "@/components/map/SurplusMap";
-import { IMG, CROP_META } from "@/data/images";
+import { IMG } from "@/data/images";
 import { FORECASTS, NATIONAL_DEMAND } from "@/data/mockData";
-import type { Crop } from "@/types";
 import { KOLAR_SCENARIO, PORTFOLIO } from "@/data/scenario";
 import { tonnes } from "@/lib/format";
 
 const NAV_LINKS = [
   ["Platform", "#platform"],
   ["Network", "#network"],
-];
-
-const CROPS: Crop[] = [
-  "Tomato", "Onion", "Potato", "Mango", "Banana", "Cabbage",
-  "Chilli", "Grapes", "Cauliflower", "Peas", "Pomegranate", "Apple",
 ];
 
 export default function Landing() {
@@ -190,26 +184,6 @@ export default function Landing() {
           <div className="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-semibold text-ink-2">
             {["FPOs & Cooperatives", "Mandis & APMCs", "Processors", "Cold-chain operators", "Food banks & NGOs"].map((t) => (
               <span key={t} className="opacity-80">{t}</span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ---- Crop variety strip ---- */}
-      <section className="border-b border-line bg-canvas">
-        <div className="mx-auto max-w-6xl px-5 py-6">
-          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
-            <p className="text-sm font-semibold text-ink">
-              Tracking {CROPS.length} crops across 11 states
-            </p>
-            <p className="text-xs text-ink-3">Each with its own perishability, pricing and demand profile</p>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {CROPS.map((c) => (
-              <span key={c} className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink-2">
-                <span className="text-base leading-none">{CROP_META[c].emoji}</span>
-                {c}
-              </span>
             ))}
           </div>
         </div>

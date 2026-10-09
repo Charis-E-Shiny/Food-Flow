@@ -448,24 +448,27 @@ FoodFlow is being moved from prototype toward a real data-backed system. What is
 | **Market** (Agmarknet / data.gov.in) | ⚠️ live connector built & unit-tested, but `api.data.gov.in` **isn't reachable in this build** — no data fabricated, status recorded | `npm run ingest:market` (needs key + egress) |
 | **Price-forecast model** | ✅ **trained on real data** — 7-day-ahead mandi modal-price forecaster on `master_aggriculture_dataset.csv` (654k market-days, 1,377 markets, 5 commodities, 2023–25); chronological held-out test; beats naive persistence by **~10% RMSE** and seasonal climatology by **~73% RMSE**. Metrics shown live on **Impact** | `npm run ml:train:price` → [`ml/`](ml/README.md) |
 | **ML pipeline (weather)** | ✅ **real & reproducible** — chronological split, baselines vs GradientBoosting, honest MAE/RMSE on real Open-Meteo history | `npm run ml:train` → [`ml/`](ml/README.md) |
+| **Real market prices** | ✅ **real dataset prices in the UI** — per-market modal prices sliced from `master_aggriculture_dataset.csv` (Tomato, Onion, Potato, Rice, Wheat). In **Live data** mode the Market board and each commodity's **price-by-place** view show these real numbers; Demo mode shows the illustrative board | `npm run ml:export:prices` → `public/data/market-prices.json` |
+| **Per-commodity optimizer** | ✅ the Optimize page rebuilds a full scenario for the **selected** surplus event — destinations priced to that crop — so allocation, greedy baseline and realized ₹ differ per commodity (no longer always tomato) | `src/data/destinations.ts`, `npm run test` |
 | **Allocation optimizer** | ✅ real marginal-value optimizer (concave objective, capacity + conservation constraints), compared to greedy baseline | `npm run test` |
 | **Provenance** | ✅ UI distinguishes **Live / Historical / Model / Estimate / Demo**; never labels fallback as Live | `src/lib/provenance.ts` |
-| **Live / Demo toggle** | ✅ a top-bar switch flips the whole app between **Demo** (illustrative scenario only, the default) and **Live data** (the real ingested weather snapshot + the trained model's held-out metrics activate). Simulated and real numbers never mix; the choice persists per browser | `src/lib/dataMode.tsx` |
+| **Live / Demo toggle** | ✅ a top-bar switch flips the whole app between **Demo** (illustrative scenario only, the default) and **Live data**, which activates every real source: the ingested weather snapshot, the trained model's held-out metrics, and real dataset market prices. Simulated and real numbers never mix; the choice persists per browser | `src/lib/dataMode.tsx` |
 
 ```bash
-npm run test            # 17 tests: normalization, optimizer constraints, engine invariants
+npm run test            # 32 tests: normalization, optimizer constraints, engine + per-crop invariants
 npm run ingest:weather  # real Open-Meteo snapshot → public/data/weather.json
-npm run ml:train        # real weather training → ml/artifacts/metrics.json
 npm run ml:train:price  # real price model → ml/artifacts/price_metrics.json + public/data/model-metrics.json
+npm run ml:export:prices # real per-market prices → public/data/market-prices.json
 ```
 
 > **Honesty notes.** A real **price-forecast model is now trained** on
 > `master_aggriculture_dataset.csv`; its metrics on the **Impact** page are the
 > model's own held-out test numbers (never fabricated), and we report where
 > naive persistence still wins (typical-day MAE) rather than cherry-pick. These
-> real numbers (and the live weather feed) load only when the top-bar
-> **Live data** toggle is on — Demo mode stays purely illustrative so the two
-> never blur. The
+> real numbers — the model metrics, the live weather feed, and the real
+> per-market dataset prices in the Market board and each commodity's
+> price-by-place view — load only when the top-bar **Live data** toggle is on.
+> Demo mode stays purely illustrative so the two never blur. The
 > live Agmarknet *ingestion* panel stays labeled **Demo** until the API is
 > reachable with a key. Surplus risk is a **transparent heuristic**, not a
 > trained model and **not** verified food waste. The traceability ledger is
@@ -499,10 +502,11 @@ traceability ledger remain illustrative, and no blockchain transaction occurred.
 - [x] Real optimizer (marginal-value / concave objective) + constraint tests
 - [x] Reproducible ML pipeline with honest metrics
 - [x] Train the price model on real mandi history (7-day-ahead, metrics live on Impact)
+- [x] Real dataset prices in the Market board + price-by-place view (Live mode)
+- [x] Per-event optimization for every commodity (not just the canonical scenario)
 - [ ] Reach `api.data.gov.in` + key → live Agmarknet prices (connector ready)
 - [ ] Wire the trained model to score live forecasts in-app (currently reports held-out metrics)
 - [ ] Backend for scheduled ingestion, persistence & secure credentials
-- [ ] Per-event optimization for every city (not just the canonical scenario)
 - [ ] Real persistence + QR deep-link verification for batches
 - [ ] Farmer SMS / IVR channel · Dark mode
 

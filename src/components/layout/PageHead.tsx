@@ -11,11 +11,13 @@ export function PageHead({
   actions?: ReactNode;
   eyebrow?: string;
 }) {
+  // Strip any leading step-number prefix ("04 · Optimize" → "Optimize").
+  const cleanEyebrow = eyebrow?.replace(/^\s*\d+\s*·\s*/, "");
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        {eyebrow && (
-          <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-brand">{eyebrow}</div>
+        {cleanEyebrow && (
+          <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-brand">{cleanEyebrow}</div>
         )}
         <h1 className="text-2xl font-bold tracking-tight text-ink">{title}</h1>
         {sub && <p className="mt-1.5 max-w-2xl text-sm text-ink-2">{sub}</p>}

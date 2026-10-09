@@ -1,0 +1,531 @@
+{
+  "generatedAt": "2026-10-09T00:19:12.570663+00:00",
+  "source": "master_aggriculture_dataset.csv — Agmarknet-style daily modal prices",
+  "unit": "INR/kg",
+  "span": {
+    "from": "2023-06-06",
+    "to": "2025-06-11"
+  },
+  "commodities": {
+    "Onion": {
+      "latestDate": "2025-06-11",
+      "modalPricePerKg": 18.9,
+      "trend7dPct": 9.8,
+      "marketCount": 1044,
+      "places": [
+        {
+          "state": "Haryana",
+          "market": "Chhachrauli",
+          "pricePerKg": 30.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Velayuthampalayam(Uzhavar Sandhai )",
+          "pricePerKg": 30.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Karur(Uzhavar Sandhai )",
+          "pricePerKg": 30.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Kulithalai(Uzhavar Sandhai )",
+          "pricePerKg": 30.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Vellore",
+          "pricePerKg": 28.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Kahithapattarai(Uzhavar Sandhai )",
+          "pricePerKg": 28.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Jammu And Kashmir",
+          "market": "Kulgam",
+          "pricePerKg": 25.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Sambhal",
+          "pricePerKg": 14.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Jammu & Kashmir",
+          "market": "Kathua",
+          "pricePerKg": 13.5,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Manjhanpur",
+          "pricePerKg": 12.2,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Madhya Pradesh",
+          "market": "Neemuch",
+          "pricePerKg": 12.1,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Saharanpur",
+          "pricePerKg": 12.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Ujhani",
+          "pricePerKg": 11.5,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Mirzapur",
+          "pricePerKg": 11.2,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Gujarat",
+          "market": "Mahuva(Station Road)",
+          "pricePerKg": 11.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Chattisgarh",
+          "market": "Rajnandgaon",
+          "pricePerKg": 10.0,
+          "date": "2025-06-11"
+        }
+      ]
+    },
+    "Potato": {
+      "latestDate": "2025-06-11",
+      "modalPricePerKg": 22.0,
+      "trend7dPct": 15.0,
+      "marketCount": 971,
+      "places": [
+        {
+          "state": "Kerala",
+          "market": "Piravam",
+          "pricePerKg": 50.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Gingee(Uzhavar Sandhai )",
+          "pricePerKg": 40.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Mohanur(Uzhavar Sandhai )",
+          "pricePerKg": 40.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Ulundurpettai",
+          "pricePerKg": 40.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Mannargudi I(Uzhavar Sandhai )",
+          "pricePerKg": 38.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Kerala",
+          "market": "Anchal",
+          "pricePerKg": 36.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Paramathivelur(Uzhavar Sandhai )",
+          "pricePerKg": 35.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Tindivanam",
+          "pricePerKg": 35.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Namakkal(Uzhavar Sandhai )",
+          "pricePerKg": 34.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Sunguvarchatram(Uzhavar Sandhai )",
+          "pricePerKg": 30.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Tamilnadu",
+          "market": "Katpadi (Uzhavar Sandhai )",
+          "pricePerKg": 26.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Orissa",
+          "market": "Pattamundai",
+          "pricePerKg": 18.0,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Rajasthan",
+          "market": "Pratapgarh",
+          "pricePerKg": 12.9,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Ballia",
+          "pricePerKg": 12.2,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Rasda",
+          "pricePerKg": 11.8,
+          "date": "2025-06-11"
+        },
+        {
+          "state": "Haryana",
+          "market": "Dabwali",
+          "pricePerKg": 9.0,
+          "date": "2025-06-11"
+        }
+      ]
+    },
+    "Rice": {
+      "latestDate": "2025-06-06",
+      "modalPricePerKg": 36.6,
+      "trend7dPct": 2.6,
+      "marketCount": 195,
+      "places": [
+        {
+          "state": "Maharashtra",
+          "market": "Sangli",
+          "pricePerKg": 67.5,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Saharanpur",
+          "pricePerKg": 34.0,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Achnera",
+          "pricePerKg": 33.7,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Wazirganj",
+          "pricePerKg": 33.5,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Puwaha",
+          "pricePerKg": 33.4,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Sultanpur",
+          "pricePerKg": 33.0,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Shahjahanpur",
+          "pricePerKg": 32.6,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Tilhar",
+          "pricePerKg": 32.6,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Rampur",
+          "pricePerKg": 32.6,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Baraut",
+          "pricePerKg": 32.5,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Milak",
+          "pricePerKg": 32.5,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Amroha",
+          "pricePerKg": 32.4,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Balrampur",
+          "pricePerKg": 31.8,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Bahraich",
+          "pricePerKg": 31.5,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Maharashtra",
+          "market": "Murud",
+          "pricePerKg": 26.0,
+          "date": "2025-06-06"
+        },
+        {
+          "state": "Maharashtra",
+          "market": "Alibagh",
+          "pricePerKg": 26.0,
+          "date": "2025-06-06"
+        }
+      ]
+    },
+    "Tomato": {
+      "latestDate": "2023-11-06",
+      "modalPricePerKg": 20.7,
+      "trend7dPct": 8.6,
+      "marketCount": 660,
+      "places": [
+        {
+          "state": "West Bengal",
+          "market": "Durgapur",
+          "pricePerKg": 36.0,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Orissa",
+          "market": "Balugaon",
+          "pricePerKg": 30.0,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Kerala",
+          "market": "Aluva",
+          "pricePerKg": 30.0,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Orissa",
+          "market": "Angaura",
+          "pricePerKg": 27.0,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Jammu & Kashmir",
+          "market": "Akhnoor",
+          "pricePerKg": 24.0,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Kerala",
+          "market": "Chala",
+          "pricePerKg": 23.0,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Punjab",
+          "market": "Dudhansadhan",
+          "pricePerKg": 22.0,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Punjab",
+          "market": "Bhawanigarh",
+          "pricePerKg": 20.0,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Haryana",
+          "market": "Ambala City(Subji Mandi)",
+          "pricePerKg": 19.0,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Anandnagar",
+          "pricePerKg": 17.2,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Jafarganj",
+          "pricePerKg": 15.6,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Akbarpur",
+          "pricePerKg": 15.4,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Deoband",
+          "pricePerKg": 15.0,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Achalda",
+          "pricePerKg": 15.0,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Rajasthan",
+          "market": "Bikaner (F&V)",
+          "pricePerKg": 9.0,
+          "date": "2023-11-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Gadaura",
+          "pricePerKg": 9.0,
+          "date": "2023-11-06"
+        }
+      ]
+    },
+    "Wheat": {
+      "latestDate": "2024-02-06",
+      "modalPricePerKg": 25.1,
+      "trend7dPct": -1.0,
+      "marketCount": 737,
+      "places": [
+        {
+          "state": "Maharashtra",
+          "market": "Shahada",
+          "pricePerKg": 28.0,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "Maharashtra",
+          "market": "Nagpur",
+          "pricePerKg": 27.9,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "Maharashtra",
+          "market": "Katol",
+          "pricePerKg": 26.5,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Meerut",
+          "pricePerKg": 26.0,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Muzzafarnagar",
+          "pricePerKg": 25.8,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Charra",
+          "pricePerKg": 25.7,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Ahirora",
+          "pricePerKg": 25.5,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "Bihar",
+          "market": "Muzaffarpur",
+          "pricePerKg": 25.3,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "Uttar Pradesh",
+          "market": "Mirzapur",
+          "pricePerKg": 25.3,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "West Bengal",
+          "market": "Asansol",
+          "pricePerKg": 24.0,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "Madhya Pradesh",
+          "market": "Gotegaon",
+          "pricePerKg": 24.0,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "Madhya Pradesh",
+          "market": "Gadarwada",
+          "pricePerKg": 23.9,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "Maharashtra",
+          "market": "Hinganghat",
+          "pricePerKg": 23.7,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "Madhya Pradesh",
+          "market": "Narsinghpur",
+          "pricePerKg": 23.6,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "West Bengal",
+          "market": "Kandi",
+          "pricePerKg": 23.2,
+          "date": "2024-02-06"
+        },
+        {
+          "state": "West Bengal",
+          "market": "Karimpur",
+          "pricePerKg": 23.2,
+          "date": "2024-02-06"
+        }
+      ]
+    }
+  }
+}

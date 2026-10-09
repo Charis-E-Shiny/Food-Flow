@@ -8,6 +8,7 @@ import {
 } from "@/lib/engine";
 import type { DemandNode, ImpactMetric, SurplusForecast } from "@/types";
 import { CANONICAL_FORECAST_ID, DEMAND_NODES, FORECASTS, getForecast } from "./mockData";
+import { demandNodesFor } from "./destinations";
 
 // ============================================================
 // Canonical scenario bundle.
@@ -35,6 +36,13 @@ export function buildScenario(forecast: SurplusForecast, nodes: DemandNode[]) {
 export type Scenario = ReturnType<typeof buildScenario>;
 
 export const KOLAR_SCENARIO = buildScenario(getForecast(CANONICAL_FORECAST_ID)!, DEMAND_NODES);
+
+// Build the full scenario for ANY forecast, using destinations priced to
+// that crop. The canonical event returns the calibrated Kolar bundle.
+export function scenarioFor(forecast: SurplusForecast): Scenario {
+  if (forecast.id === CANONICAL_FORECAST_ID) return KOLAR_SCENARIO;
+  return buildScenario(forecast, demandNodesFor(forecast));
+}
 
 // Portfolio-level KPIs for the Command Center, derived from the
 // full forecast board (not just the canonical event).

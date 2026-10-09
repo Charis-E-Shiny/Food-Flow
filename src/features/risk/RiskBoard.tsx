@@ -122,7 +122,7 @@ function RiskRow({ f }: { f: SurplusForecast }) {
                 <Link to={`/event/${f.id}`} className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-line-strong bg-surface px-3 py-2 text-sm font-semibold text-ink hover:bg-surface-2">
                   Open event <ArrowRight size={14} />
                 </Link>
-                <Link to="/optimize" className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-brand px-3 py-2 text-sm font-semibold text-white hover:bg-brand-strong">
+                <Link to={f.id === "sf-kolar-tomato" ? "/optimize" : `/optimize?event=${f.id}`} className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-brand px-3 py-2 text-sm font-semibold text-white hover:bg-brand-strong">
                   <Target size={14} /> Optimize
                 </Link>
               </div>

@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Factory, Gauge, Play, RotateCcw, Store, Target, Users } from "lucide-react";
 import { PageHead } from "@/components/layout/PageHead";
 import { Card, SectionTitle, Badge, Button, LinkButton, Meter } from "@/components/ui";
 import { AllocationFlow } from "./AllocationFlow";
-import { KOLAR_SCENARIO } from "@/data/scenario";
+import { scenarioFor, type Scenario } from "@/data/scenario";
+import { FORECASTS, CANONICAL_FORECAST_ID, getForecast } from "@/data/mockData";
+import { CROP_META } from "@/data/images";
 import { runOptimizer, objectiveOf, toOptInputs } from "@/lib/optimizer";
 import { tonnes, hours, rupeesPerKg, rupees } from "@/lib/format";
 import type { AllocationLeg, DemandNode } from "@/types";
@@ -18,7 +21,11 @@ const kindIcon: Record<DemandNode["kind"], typeof Store> = {
 };
 
 export default function Optimization() {
-  const { forecast, nodes, allocation, scoredNodes } = KOLAR_SCENARIO;
+  const [params, setParams] = useSearchParams();
+  const selectedId = getForecast(params.get("event") ?? "")?.id ?? CANONICAL_FORECAST_ID;
+  const scenario = useMemo<Scenario>(() => scenarioFor(getForecast(selectedId)!), [selectedId]);
+  const { forecast, nodes, allocation, scoredNodes } = scenario;
+
   const [phase, setPhase] = useState<Phase>("idle");
   const [activeStep, setActiveStep] = useState(-1);
   const timers = useRef<number[]>([]);
@@ -28,6 +35,15 @@ export default function Optimization() {
     timers.current = [];
   };
   useEffect(() => clear, []);
+
+  // Reset the animation whenever the selected event changes.
+  useEffect(() => {
+    clear();
+    setPhase("idle");
+    setActiveStep(-1);
+  }, [selectedId]);
+
+  const selectEvent = (id: string) => setParams(id === CANONICAL_FORECAST_ID ? {} : { event: id }, { replace: true });
 
   const run = () => {
     clear();
@@ -52,15 +68,18 @@ export default function Optimization() {
         title="Allocation engine"
         sub="Where should it go? Multi-destination optimization that balances urgency, capacity, demand and distance — not just price."
         actions={
-          phase === "idle" ? (
-            <Button size="lg" onClick={run}>
-              <Play size={17} /> Optimize rescue
-            </Button>
-          ) : (
-            <Button size="lg" variant="secondary" onClick={reset}>
-              <RotateCcw size={16} /> Reset
-            </Button>
-          )
+          <div className="flex items-center gap-2">
+            <EventPicker selectedId={forecast.id} onSelect={selectEvent} />
+            {phase === "idle" ? (
+              <Button size="lg" onClick={run}>
+                <Play size={17} /> Optimize rescue
+              </Button>
+            ) : (
+              <Button size="lg" variant="secondary" onClick={reset}>
+                <RotateCcw size={16} /> Reset
+              </Button>
+            )}
+          </div>
         }
       />
 
@@ -90,8 +109,8 @@ export default function Optimization() {
         {phase === "idle" && (
           <div className="mt-2 flex flex-col items-center gap-3 border-t border-line pt-4 text-center">
             <p className="max-w-lg text-sm text-ink-2">
-              {tonnes(forecast.predictedQuantityT)} of tomato is at risk in Kolar. Run the optimizer to
-              place it across the four best destinations before the usable window closes.
+              {tonnes(forecast.predictedQuantityT)} of {forecast.crop.toLowerCase()} is at risk in {forecast.location}. Run the optimizer to
+              place it across the best destinations before the usable window closes.
             </p>
             <Button size="lg" onClick={run}>
               <Target size={17} /> Optimize rescue
@@ -197,7 +216,7 @@ export default function Optimization() {
       </div>
 
       <div className="mt-4">
-        <OptimizerComparison />
+        <OptimizerComparison scenario={scenario} />
       </div>
 
       {phase === "done" && (
@@ -210,6 +229,30 @@ export default function Optimization() {
         </div>
       )}
     </div>
+  );
+}
+
+// Event picker — choose which surplus event to optimize. Defaults to the
+// canonical Kolar tomato; any other crop rebuilds the whole scenario with
+// destinations priced to that commodity.
+function EventPicker({ selectedId, onSelect }: { selectedId: string; onSelect: (id: string) => void }) {
+  const current = getForecast(selectedId)!;
+  return (
+    <label className="relative inline-flex items-center">
+      <span className="pointer-events-none absolute left-3 text-base">{CROP_META[current.crop].emoji}</span>
+      <select
+        aria-label="Select surplus event to optimize"
+        value={selectedId}
+        onChange={(e) => onSelect(e.target.value)}
+        className="h-11 cursor-pointer rounded-xl border border-line-strong bg-surface pl-9 pr-8 text-sm font-medium text-ink outline-none transition-colors hover:bg-surface-2 focus:border-brand"
+      >
+        {FORECASTS.map((f) => (
+          <option key={f.id} value={f.id}>
+            {f.crop} · {f.location}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 
@@ -248,8 +291,8 @@ function Stat({ label, value }: { label: string; value: string }) {
 // Real optimizer (marginal-value / diminishing-returns) vs the greedy
 // baseline, scored on the same objective: expected realized value net of
 // transport and spoilage.
-function OptimizerComparison() {
-  const { forecast, nodes, allocation } = KOLAR_SCENARIO;
+function OptimizerComparison({ scenario }: { scenario: Scenario }) {
+  const { forecast, nodes, allocation } = scenario;
   const opt = runOptimizer(forecast, nodes);
   const inputs = toOptInputs(nodes);
   const baseObj = objectiveOf(allocation.legs, inputs, forecast.spoilageWindowHours);

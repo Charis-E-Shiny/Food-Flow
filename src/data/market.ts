@@ -12,7 +12,7 @@ import type { SurplusForecast } from "@/types";
 // + an ML forecaster; here they are generated to demonstrate the UI.
 // ============================================================
 
-function hash(s: string): number {
+export function hash(s: string): number {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) {
     h ^= s.charCodeAt(i);
@@ -20,7 +20,7 @@ function hash(s: string): number {
   }
   return h >>> 0;
 }
-function rng(seed: number) {
+export function rng(seed: number) {
   let a = seed >>> 0;
   return () => {
     a |= 0;
@@ -32,7 +32,7 @@ function rng(seed: number) {
 }
 
 // Real nearby mandi towns per producing region (adds authenticity).
-const NEARBY: Record<string, string[]> = {
+export const NEARBY: Record<string, string[]> = {
   Kolar: ["Chintamani", "Mulbagal", "Srinivaspur", "KGF"],
   Nashik: ["Lasalgaon", "Pimpalgaon", "Yeola", "Manmad"],
   Agra: ["Firozabad", "Mathura", "Etmadpur", "Fatehabad"],
