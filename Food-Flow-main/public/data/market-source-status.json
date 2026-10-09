@@ -1,0 +1,12 @@
+{
+  "source": "Agmarknet via data.gov.in (OGD)",
+  "resource": "9ef84268-d588-465a-a308-a864a43d0070",
+  "accessible": false,
+  "checkedAt": "2026-10-08T22:19:22.892Z",
+  "error": "fetch failed",
+  "note": "The data.gov.in API host was not reachable / returned no data from this environment. No market records were fabricated. Provide network egress to api.data.gov.in and a valid DATA_GOV_IN_API_KEY, then re-run `npm run ingest:market`.",
+  "requires": [
+    "Outbound HTTPS access to api.data.gov.in",
+    "A registered data.gov.in API key (DATA_GOV_IN_API_KEY)"
+  ]
+}

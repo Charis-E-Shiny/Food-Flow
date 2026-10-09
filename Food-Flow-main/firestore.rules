@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId)
+        && request.resource.data.keys().hasOnly([
+          'name', 'email', 'org', 'role', 'initials', 'updatedAt'
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.org is string
+        && request.resource.data.role is string
+        && request.resource.data.initials is string
+        && request.resource.data.updatedAt == request.time;
+
+      match /operationalData/{recordId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && request.resource.data.keys().hasOnly(['id', 'kind', 'status', 'updatedAt'])
+          && request.resource.data.id is string
+          && request.resource.data.id.size() > 0
+          && request.resource.data.id.size() <= 100
+          && recordId == request.resource.data.kind + '-' + request.resource.data.id
+          && request.resource.data.updatedAt == request.time
+          && (
+            (request.resource.data.kind == 'recipient'
+              && request.resource.data.status in ['offered', 'accepted', 'received'])
+            ||
+            (request.resource.data.kind == 'shipment'
+              && request.resource.data.status in ['Dispatched', 'In transit', 'Delivered'])
+          );
+      }
+    }
+  }
+}
