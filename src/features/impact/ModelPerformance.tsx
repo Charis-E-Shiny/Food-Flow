@@ -1,7 +1,8 @@
-import { Activity, Database, Info, TrendingDown } from "lucide-react";
+import { Activity, Database, Info, Radio, TrendingDown } from "lucide-react";
 import { Card, SectionTitle } from "@/components/ui";
 import { ProvenanceBadge } from "@/components/ui/ProvenanceBadge";
 import { useModelMetrics, type ModelMetrics } from "@/hooks/useModelMetrics";
+import { useDataMode } from "@/lib/dataMode";
 
 // Real held-out test metrics from the price forecaster trained on
 // master_aggriculture_dataset.csv. Honest framing: the model's genuine win
@@ -28,6 +29,7 @@ const fmtDate = (s: string) =>
 
 export function ModelPerformance() {
   const state = useModelMetrics();
+  const { setLive } = useDataMode();
 
   return (
     <Card className="p-5">
@@ -37,6 +39,23 @@ export function ModelPerformance() {
         sub="A 7-day-ahead mandi modal-price forecaster, trained on a real Agmarknet-style dataset and scored on a chronological, held-out test set it never saw during training."
         right={<ProvenanceBadge kind="model" note="held-out test" />}
       />
+      {state.status === "demo" && (
+        <div className="mt-4 flex flex-col items-start gap-3 rounded-xl border border-dashed border-line-strong bg-surface-2 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-2.5">
+            <Radio size={16} className="mt-0.5 shrink-0 text-ink-3" />
+            <p className="text-sm text-ink-2">
+              <b className="text-ink">Demo mode.</b> The real trained-model metrics load only in{" "}
+              <b>Live data</b> mode — kept honest, so simulated and real numbers never mix.
+            </p>
+          </div>
+          <button
+            onClick={() => setLive(true)}
+            className="shrink-0 rounded-lg bg-brand px-3 py-2 text-sm font-semibold text-white shadow-card transition-colors hover:bg-brand-strong"
+          >
+            Switch to Live data
+          </button>
+        </div>
+      )}
       {state.status === "loading" && <Skeleton />}
       {state.status === "error" && (
         <p className="mt-4 text-sm text-ink-2">

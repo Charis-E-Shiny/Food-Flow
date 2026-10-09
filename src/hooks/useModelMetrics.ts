@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useDataMode } from "@/lib/dataMode";
 
 // Loads ml/artifacts/price_metrics.json (mirrored to public/data/model-metrics.json
 // by `npm run ml:train:price`). These are REAL held-out test metrics from the
@@ -34,16 +35,25 @@ export interface ModelMetrics {
 
 type State =
   | { status: "loading" }
+  | { status: "demo" }
   | { status: "error" }
   | { status: "ready"; data: ModelMetrics };
 
 let cache: State | null = null;
 
 export function useModelMetrics(): State {
+  const { live } = useDataMode();
   const [state, setState] = useState<State>(cache ?? { status: "loading" });
 
   useEffect(() => {
-    if (cache) return;
+    if (!live) {
+      setState({ status: "demo" });
+      return;
+    }
+    if (cache) {
+      setState(cache);
+      return;
+    }
     let alive = true;
     fetch(`${import.meta.env.BASE_URL}data/model-metrics.json`, { cache: "no-store" })
       .then((r) => {
@@ -65,7 +75,7 @@ export function useModelMetrics(): State {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [live]);
 
   return state;
 }

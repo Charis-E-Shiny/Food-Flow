@@ -450,6 +450,7 @@ FoodFlow is being moved from prototype toward a real data-backed system. What is
 | **ML pipeline (weather)** | ✅ **real & reproducible** — chronological split, baselines vs GradientBoosting, honest MAE/RMSE on real Open-Meteo history | `npm run ml:train` → [`ml/`](ml/README.md) |
 | **Allocation optimizer** | ✅ real marginal-value optimizer (concave objective, capacity + conservation constraints), compared to greedy baseline | `npm run test` |
 | **Provenance** | ✅ UI distinguishes **Live / Historical / Model / Estimate / Demo**; never labels fallback as Live | `src/lib/provenance.ts` |
+| **Live / Demo toggle** | ✅ a top-bar switch flips the whole app between **Demo** (illustrative scenario only, the default) and **Live data** (the real ingested weather snapshot + the trained model's held-out metrics activate). Simulated and real numbers never mix; the choice persists per browser | `src/lib/dataMode.tsx` |
 
 ```bash
 npm run test            # 17 tests: normalization, optimizer constraints, engine invariants
@@ -461,7 +462,10 @@ npm run ml:train:price  # real price model → ml/artifacts/price_metrics.json +
 > **Honesty notes.** A real **price-forecast model is now trained** on
 > `master_aggriculture_dataset.csv`; its metrics on the **Impact** page are the
 > model's own held-out test numbers (never fabricated), and we report where
-> naive persistence still wins (typical-day MAE) rather than cherry-pick. The
+> naive persistence still wins (typical-day MAE) rather than cherry-pick. These
+> real numbers (and the live weather feed) load only when the top-bar
+> **Live data** toggle is on — Demo mode stays purely illustrative so the two
+> never blur. The
 > live Agmarknet *ingestion* panel stays labeled **Demo** until the API is
 > reachable with a key. Surplus risk is a **transparent heuristic**, not a
 > trained model and **not** verified food waste. The traceability ledger is

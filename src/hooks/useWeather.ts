@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useDataMode } from "@/lib/dataMode";
 
 // Loads the ingested weather snapshot (public/data/weather.json) produced
 // by `npm run ingest:weather` (real Open-Meteo data). Exposes explicit
 // loading / error / no-data states so the UI never silently shows demo
-// data as if it were live.
+// data as if it were live. Only fetches in Live mode; in Demo mode it
+// returns "demo" so consumers show the clearly-labeled scenario values.
 
 export interface WeatherLocation {
   id: string;
@@ -20,16 +22,25 @@ interface WeatherFile {
 }
 type State =
   | { status: "loading" }
+  | { status: "demo" }
   | { status: "error" }
   | { status: "ready"; source: string; retrievedAt: string; byId: Map<string, WeatherLocation> };
 
 let cache: State | null = null;
 
 export function useWeather(): State {
+  const { live } = useDataMode();
   const [state, setState] = useState<State>(cache ?? { status: "loading" });
 
   useEffect(() => {
-    if (cache) return;
+    if (!live) {
+      setState({ status: "demo" });
+      return;
+    }
+    if (cache) {
+      setState(cache);
+      return;
+    }
     let alive = true;
     fetch(`${import.meta.env.BASE_URL}data/weather.json`, { cache: "no-store" })
       .then((r) => {
@@ -56,7 +67,7 @@ export function useWeather(): State {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [live]);
 
   return state;
 }

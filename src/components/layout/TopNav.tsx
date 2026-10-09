@@ -4,8 +4,36 @@ import { ChevronDown, ChevronRight, LogOut, Menu, Settings, Store, User as UserI
 import { cn } from "@/lib/cn";
 import { Logo } from "./Logo";
 import { useAuth } from "@/lib/auth";
+import { useDataMode } from "@/lib/dataMode";
 import { TOOLS, WORKFLOW, stepIndex } from "@/data/workflow";
 import { NotificationBell } from "./NotificationBell";
+
+// Live/Demo data toggle. Demo (default) = illustrative scenario only;
+// Live = the real ingested weather + trained-model metrics activate.
+function DataModeToggle({ className }: { className?: string }) {
+  const { live, toggle } = useDataMode();
+  return (
+    <button
+      onClick={toggle}
+      role="switch"
+      aria-checked={live}
+      title={live ? "Live data on — using real weather & trained-model metrics" : "Demo mode — illustrative data only. Click to use live data."}
+      className={cn(
+        "group inline-flex items-center gap-2 rounded-full border py-1 pl-2.5 pr-1 text-xs font-semibold transition-colors",
+        live ? "border-ok/40 bg-ok-soft text-ok" : "border-line bg-surface-2 text-ink-3 hover:text-ink",
+        className,
+      )}
+    >
+      <span className="inline-flex items-center gap-1.5">
+        {live && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-ok" />}
+        {live ? "Live data" : "Demo"}
+      </span>
+      <span className={cn("relative h-5 w-9 rounded-full transition-colors", live ? "bg-ok" : "bg-line-strong")}>
+        <span className={cn("absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all", live ? "left-[18px]" : "left-0.5")} />
+      </span>
+    </button>
+  );
+}
 
 function useDismiss(onClose: () => void) {
   const ref = useRef<HTMLDivElement>(null);
@@ -54,6 +82,7 @@ export function TopNav() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-1.5">
+          <DataModeToggle className="hidden sm:inline-flex" />
           <NavLink
             to="/marketplace"
             className={({ isActive }) =>
@@ -187,6 +216,11 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
           <button onClick={onClose} className="rounded-lg p-1.5 text-ink-3 hover:bg-surface-2" aria-label="Close">
             <X size={18} />
           </button>
+        </div>
+
+        <div className="mt-5 flex items-center justify-between rounded-xl border border-line bg-surface-2 px-3 py-2.5">
+          <span className="text-sm font-medium text-ink-2">Data source</span>
+          <DataModeToggle />
         </div>
 
         <div className="mt-5 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-3">Workflow</div>

@@ -2,6 +2,7 @@ import { CloudRain, Droplets, Thermometer } from "lucide-react";
 import { Card, SectionTitle } from "@/components/ui";
 import { ProvenanceBadge } from "@/components/ui/ProvenanceBadge";
 import { useWeather } from "@/hooks/useWeather";
+import { useDataMode } from "@/lib/dataMode";
 import { freshness } from "@/lib/provenance";
 import type { SurplusForecast } from "@/types";
 
@@ -10,6 +11,7 @@ import type { SurplusForecast } from "@/types";
 // temperature ONLY when live data is unavailable — and labels it as demo.
 export function WeatherPanel({ forecast }: { forecast: SurplusForecast }) {
   const w = useWeather();
+  const { live } = useDataMode();
 
   if (w.status === "loading") {
     return (
@@ -38,11 +40,15 @@ export function WeatherPanel({ forecast }: { forecast: SurplusForecast }) {
           <span className="grid h-11 w-11 place-items-center rounded-xl bg-surface-2 text-ink-2"><Thermometer size={20} /></span>
           <div>
             <div className="nums text-2xl font-bold text-ink">{forecast.temperatureC}°C</div>
-            <div className="text-xs text-ink-3">scenario temperature · live feed unavailable</div>
+            <div className="text-xs text-ink-3">scenario temperature · {live ? "live feed unavailable" : "demo mode"}</div>
           </div>
         </div>
         <p className="mt-3 text-[11px] text-ink-3">
-          Run <code className="rounded bg-surface-2 px-1">npm run ingest:weather</code> to populate live Open-Meteo data.
+          {live ? (
+            <>Run <code className="rounded bg-surface-2 px-1">npm run ingest:weather</code> to populate live Open-Meteo data.</>
+          ) : (
+            <>Switch to <b>Live data</b> in the top bar to load real Open-Meteo weather.</>
+          )}
         </p>
       </Card>
     );
